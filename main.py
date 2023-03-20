@@ -1,56 +1,76 @@
 #!/usr/bin/env python3
 
+import os
 import argparse
 from tqdm import tqdm, trange
-import os
-from time import sleep
-from pathlib import Path
-from polaris import functions
+from polaris import functions as polfuncs
 
-def dosomething(buf):
-    """Do something with the content of a file"""
-    sleep(0.0001)
+
+VALID_IMAGES = ["jpg","png"]
+
+class InputDirectoryException(Exception):
     pass
 
-def walkdir(folder):
-    """Walk through each files in a directory"""
-    for dirpath, dirs, files in os.walk(folder):
-        for filename in files:
-            yield os.path.abspath(os.path.join(dirpath, filename))
+class OutputDirectoryException(Exception):
+    pass
 
 
-def process_content(inputpath, blocksize=1024):
-    # Preprocess the total files sizes
-    sizecounter = 0
-    for filepath in tqdm(walkdir(inputpath), unit="files"):
-        sizecounter += os.stat(filepath).st_size
+def get_images(folder):
+    """Get all images that can be manipulated in the passed folder ONLY"""
+    for item in os.listdir(folder):
+        if os.path.isfile(os.path.join(folder, item)):
+            try:
+                if item.split(".")[1].lower() not in VALID_IMAGES:
+                    continue
+            except IndexError:
+                continue
+            yield os.path.abspath(os.path.join(folder, item))
 
-    # Load tqdm with size counter instead of file counter
-    with tqdm(total=sizecounter,
-              unit='B', unit_scale=True, unit_divisor=1024) as pbar:
-        for filepath in walkdir(inputpath):
-            with open(filepath, 'rb') as fh:
-                buf = 1
-                while (buf):
-                    buf = fh.read(blocksize)
-                    dosomething(buf)
-                    if buf:
-                        pbar.set_postfix(file=filepath[-10:], refresh=False)
-                        pbar.update(len(buf))
+def check_if_folder(folder_in, folder_out):
+    """Checks if the passed directory is a valid folder to be operated on"""
+    if not os.path.isdir(folder_in):
+        raise InputDirectoryException
+    if not os.path.isdir(folder_out):
+        raise OutputDirectoryException
+
+
+def process_content(inputpath, outputpath):
+    # Preprocess the total files count
+    img_list = []
+    for filepath in tqdm(get_images(inputpath), unit=" images"):
+        img_list.append(filepath)
+
+    print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN {inputpath}, RUNNING MODEL ON ALL IMAGES NOW....")
+    img_list_res = []
+    for image in tqdm(img_list, total=len(img_list), unit="images"):
+        cur_res = polfuncs.get_preds(image, outputpath)
+        # print(cur_res)
+            
+    
+    print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{outputpath}]!")
+
 
 def _main(parser=argparse.ArgumentParser()):
 
     # construct the argument parser and parse the arguments
-    parser.add_argument("-i", "--input_path", help="Path to the input image directory", type=str)
+    subparser = parser.add_subparsers(dest='command')
+
+    predict = subparser.add_parser("predict", help="Run model on a directory of images and same the results on a passed folder")
     
-    parser.add_argument("-o", "--output_path", help="Path to the output image directory", type=str)
+    predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
+    
+    predict.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
+    
 
     args = parser.parse_args()
-
-    if args.input_path:
-        process_content(args.input_path)
-    if args.output_path:
-        process_content(args.output_path)
+    if args.command == 'predict':
+        try:
+            check_if_folder(args.input_path, args.output_path)
+            process_content(args.input_path, args.output_path)
+        except InputDirectoryException:
+            print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
+        except OutputDirectoryException:
+            print(f"[WARN] OUTPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
 
     
 
