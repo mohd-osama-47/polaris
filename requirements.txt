@@ -1,1 +1,2 @@
 tqdm
+ultralytics==8.0.54
