@@ -3,6 +3,7 @@
 import os
 import argparse
 from tqdm import tqdm, trange
+import polaris
 from polaris import functions as polfuncs
 
 
@@ -37,17 +38,17 @@ def check_if_folder(folder_in, folder_out):
 def process_content(inputpath, outputpath):
     # Preprocess the total files count
     img_list = []
-    for filepath in tqdm(get_images(inputpath), unit=" images"):
+    for filepath in tqdm(get_images(inputpath), unit="image"):
         img_list.append(filepath)
 
-    print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN {inputpath}, RUNNING MODEL ON ALL IMAGES NOW....")
+    print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING MODEL ON ALL IMAGES NOW....")
     img_list_res = []
     for image in tqdm(img_list, total=len(img_list), unit="images"):
         cur_res = polfuncs.get_preds(image, outputpath)
         # print(cur_res)
             
     
-    print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{outputpath}]!")
+    print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{os.path.abspath(outputpath)}]!")
 
 
 def _main(parser=argparse.ArgumentParser()):

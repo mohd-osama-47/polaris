@@ -16,4 +16,4 @@ def get_preds(image: str, out)->list:
     '''
     res = model.predict(image, verbose=False, stream=True)
     for r in res:
-        cv2.imwrite(out+r.path.split("/")[-1], r.plot())
+        cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
