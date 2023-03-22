@@ -10,4 +10,4 @@ cur_path = os.path.dirname(__file__)
 # Load a model
 model = YOLO(os.path.join(cur_path, 'model/model_weights.pt'))  # load the trained model
 
-model.track(source="/home/mosama/tii-competition-attempt/output.avi", show=True, verbose=False)
+model.track(source="night.avi", show=True, verbose=False)
