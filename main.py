@@ -109,6 +109,7 @@ def datum_pipeline(folder_in):
     #! "venv/lib/python3.8/site-packages/datumaro/components/annotation.py"
     from datumaro.components.dataset import Dataset
     import datumaro.plugins.transforms as transforms
+    import shutil
 
     # Import and export a dataset
     day_dataset = Dataset.import_from(os.path.join(folder_in,'Daytime'), 'coco_instances')
@@ -154,7 +155,8 @@ def datum_pipeline(folder_in):
     print("[INFO] MAPPED ALL SUB-CATEGORIES BASED ON SUPER-CATEGORY")
     print("[INFO] RE-INDEXING DAYTIME DATASET TO START FROM 1...")
     day_dataset.transform('reindex',start=1)
-    day_dataset.export(f'{folder_in}/test1', 'coco_instances')
+    # day_dataset.export(f'{folder_in}/daytime', 'coco_instances', save_media=True)
+    # day_dataset.export(f'{folder_in}/daytime', 'coco_instances')
     
     print("[INFO] ACCESSING NIGHTTIME DATASET...")
     night_dataset = transforms.RemapLabels(night_dataset,
@@ -179,13 +181,34 @@ def datum_pipeline(folder_in):
         'Buggy': 'offroad_vehicle',
         'ATV':   'offroad_vehicle',
         'Motorcyclist': 'Motorcyclist',
+
         }, default='keep')
     
     night_dataset = Dataset.from_extractors(night_dataset)
+
+    night_dataset = transforms.ProjectLabels(night_dataset,
+        dst_labels = ["Person", "offroad_vehicle", "Motorcyclist", "driver", "None", "Car", "Bus", "Truck"])
+    night_dataset = Dataset.from_extractors(night_dataset)
+
     print("[INFO] MAPPED ALL SUB-CATEGORIES BASED ON SUPER-CATEGORY")
     print("[INFO] RE-INDEXING NIGHTTIME DATASET TO START FROM 5624...")
     night_dataset.transform('reindex',start=5624)
-    day_dataset.export(f'{folder_in}/nighttime', 'coco_instances')
+    # night_dataset.export(f'{folder_in}/nighttime', 'coco_instances', save_media=True)
+    # night_dataset.export(f'{folder_in}/nighttime', 'coco_instances')
+
+
+    final_dataset = Dataset.from_extractors(day_dataset, night_dataset)
+    print(f"[INFO] SAVING MERGED DATASET TO [{folder_in}final].....")
+    final_dataset.export(f'{folder_in}/final', 'coco_instances', save_media=True)
+    
+    for file in tqdm(os.listdir(os.path.join(folder_in,'final/images/default')), unit="image"):
+        file_name = os.path.join(os.path.join(folder_in,'final/images/default'), file)
+        shutil.move(file_name, os.path.join(folder_in,'final/images'))
+    os.removedirs(os.path.join(folder_in,'final/images/default'))
+    os.rename(os.path.join(folder_in, 'final/annotations/instances_default.json'), os.path.join(folder_in, 'final/annotations/coco_annotation.json'))
+    print("[INFO] SUCCESS! DATASET IS NOW READY FOR TRAINNING!")
+    
+    # Done! :)
 
 def process_content(inputpath, outputpath):
     # Preprocess the total files count
@@ -230,8 +253,8 @@ def _main(parser=argparse.ArgumentParser()):
         
     if args.command == 'set-prep':
         try:
-            # check_dataset_folder(args.input_path)
-            # preprocess_dataset_directory(args.input_path)
+            check_dataset_folder(args.input_path)
+            preprocess_dataset_directory(args.input_path)
             datum_pipeline(args.input_path)
         except InputDirectoryException:
             print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
