@@ -2,4 +2,6 @@ opencv_contrib_python==4.7.0.72
 tqdm==4.65.0
 ultralytics==8.0.54
 lap==0.4.0
-numpy==1.23.5
+numpy
+datumaro==1.0.0
+openvino==2022.3.0
