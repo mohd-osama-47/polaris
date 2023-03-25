@@ -6,7 +6,6 @@ from tqdm import tqdm, trange
 import polaris
 import shutil
 from polaris import functions as polfuncs
-import polaris.merge as cocoMerge
 
 VALID_IMAGES = ["jpg","png"]
 
@@ -279,7 +278,7 @@ def _main(parser=argparse.ArgumentParser()):
             preprocess_dataset_directory(args.input_path)
             datum_pipeline(args.input_path)
             # next, just merge the two generated json files and add it to the final directory with all the images
-            cocoMerge.combine(f'{args.input_path}/daytime/annotations/instances_default.json', f'{args.input_path}/nighttime/annotations/instances_default.json', os.path.join(args.input_path, 'final/annotations/coco_annotation.json'))
+            polfuncs.combine(f'{args.input_path}/daytime/annotations/instances_default.json', f'{args.input_path}/nighttime/annotations/instances_default.json', os.path.join(args.input_path, 'final/annotations/coco_annotation.json'))
             # remove all extracted and generated files for clean-up :)
             cleanup_files(args.input_path)
             print("[INFO] SUCCESS! DATASET IS NOW READY FOR TRAINNING!")
