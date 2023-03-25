@@ -4,8 +4,9 @@ import os
 import argparse
 from tqdm import tqdm, trange
 import polaris
+import shutil
 from polaris import functions as polfuncs
-
+import polaris.merge as cocoMerge
 
 VALID_IMAGES = ["jpg","png"]
 
@@ -51,7 +52,7 @@ def check_dataset_folder(folder_in):
     # return dataset_structure
 
 def preprocess_dataset_directory(folder_in):
-    import zipfile, shutil
+    import zipfile
 
     # Go to the Daytime directory and extract the zip file containing the IR images
     print(f"[INFO] EXTRACTING DAYTIME IMAGES LOCATED IN [{folder_in}/Daytime/IR.zip].....")
@@ -109,13 +110,13 @@ def datum_pipeline(folder_in):
     #! "venv/lib/python3.8/site-packages/datumaro/components/annotation.py"
     from datumaro.components.dataset import Dataset
     import datumaro.plugins.transforms as transforms
-    import shutil
 
     # Import and export a dataset
     day_dataset = Dataset.import_from(os.path.join(folder_in,'Daytime'), 'coco_instances')
     night_dataset = Dataset.import_from(os.path.join(folder_in,'Nighttime'), 'coco_instances')
     print("[INFO] ACCESSING DAYTIME DATASET...")
 
+    # Merge all categories based on their supercategory
     day_dataset = transforms.RemapLabels(day_dataset,
         mapping = {
         'None': 'None',
@@ -151,13 +152,13 @@ def datum_pipeline(folder_in):
     
     day_dataset = Dataset.from_extractors(day_dataset)
 
-
     print("[INFO] MAPPED ALL SUB-CATEGORIES BASED ON SUPER-CATEGORY")
     print("[INFO] RE-INDEXING DAYTIME DATASET TO START FROM 1...")
     day_dataset.transform('reindex',start=1)
-    # day_dataset.export(f'{folder_in}/daytime', 'coco_instances', save_media=True)
-    # day_dataset.export(f'{folder_in}/daytime', 'coco_instances')
+    # just export the json file for now...
+    day_dataset.export(f'{folder_in}/daytime', 'coco_instances')
     
+    # Repeat the process for the night dataset...
     print("[INFO] ACCESSING NIGHTTIME DATASET...")
     night_dataset = transforms.RemapLabels(night_dataset,
         mapping = {
@@ -186,6 +187,8 @@ def datum_pipeline(folder_in):
     
     night_dataset = Dataset.from_extractors(night_dataset)
 
+    # Since some labels done exist here when compared to the day dataset,
+    # simple add them so that merging can occur.
     night_dataset = transforms.ProjectLabels(night_dataset,
         dst_labels = ["Person", "offroad_vehicle", "Motorcyclist", "driver", "None", "Car", "Bus", "Truck"])
     night_dataset = Dataset.from_extractors(night_dataset)
@@ -193,22 +196,41 @@ def datum_pipeline(folder_in):
     print("[INFO] MAPPED ALL SUB-CATEGORIES BASED ON SUPER-CATEGORY")
     print("[INFO] RE-INDEXING NIGHTTIME DATASET TO START FROM 5624...")
     night_dataset.transform('reindex',start=5624)
-    # night_dataset.export(f'{folder_in}/nighttime', 'coco_instances', save_media=True)
-    # night_dataset.export(f'{folder_in}/nighttime', 'coco_instances')
+    
+    # again, just save the json file for now
+    night_dataset.export(f'{folder_in}/nighttime', 'coco_instances')
 
-
+    # start generating the fused dataset with all the images in one directory
     final_dataset = Dataset.from_extractors(day_dataset, night_dataset)
     print(f"[INFO] SAVING MERGED DATASET TO [{folder_in}final].....")
     final_dataset.export(f'{folder_in}/final', 'coco_instances', save_media=True)
     
+    # this here moves the files to more conveniently labeled directories
     for file in tqdm(os.listdir(os.path.join(folder_in,'final/images/default')), unit="image"):
         file_name = os.path.join(os.path.join(folder_in,'final/images/default'), file)
         shutil.move(file_name, os.path.join(folder_in,'final/images'))
     os.removedirs(os.path.join(folder_in,'final/images/default'))
-    os.rename(os.path.join(folder_in, 'final/annotations/instances_default.json'), os.path.join(folder_in, 'final/annotations/coco_annotation.json'))
-    print("[INFO] SUCCESS! DATASET IS NOW READY FOR TRAINNING!")
     
     # Done! :)
+
+def export_to_yolo(input_folder):
+    from datumaro.components.dataset import Dataset
+    print("[INFO] EXPORTING AS YOLO DATASET...")
+    final_dataset = Dataset.import_from(os.path.join(input_folder,'final'), 'coco_instances')
+    final_dataset.export(f'{input_folder}/finalYOLO', 'yolo', save_media=True)
+    print(f"[INFO] DONE EXPORTING DATASET AS YOLO TO [{input_folder}/finalYOLO]!")
+
+def cleanup_files(input_folder):
+    '''
+    Removes all extracted and generated folders to clean up the directory
+    '''
+    os.remove(os.path.join(input_folder, "final/annotations/instances_default.json"))
+    shutil.rmtree(os.path.join(input_folder, "daytime"), ignore_errors=True)
+    shutil.rmtree(os.path.join(input_folder, "nighttime"), ignore_errors=True)
+    shutil.rmtree(os.path.join(input_folder, "Daytime/images"), ignore_errors=True)
+    shutil.rmtree(os.path.join(input_folder, "Daytime/annotations"), ignore_errors=True)
+    shutil.rmtree(os.path.join(input_folder, "Nighttime/images"), ignore_errors=True)
+    shutil.rmtree(os.path.join(input_folder, "Nighttime/annotations"), ignore_errors=True)
 
 def process_content(inputpath, outputpath):
     # Preprocess the total files count
@@ -256,6 +278,12 @@ def _main(parser=argparse.ArgumentParser()):
             check_dataset_folder(args.input_path)
             preprocess_dataset_directory(args.input_path)
             datum_pipeline(args.input_path)
+            # next, just merge the two generated json files and add it to the final directory with all the images
+            cocoMerge.combine(f'{args.input_path}/daytime/annotations/instances_default.json', f'{args.input_path}/nighttime/annotations/instances_default.json', os.path.join(args.input_path, 'final/annotations/coco_annotation.json'))
+            # remove all extracted and generated files for clean-up :)
+            cleanup_files(args.input_path)
+            print("[INFO] SUCCESS! DATASET IS NOW READY FOR TRAINNING!")
+            # export_to_yolo(args.input_path)
         except InputDirectoryException:
             print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
         except DatasetDirectoryException:
