@@ -111,7 +111,7 @@ python3 main.py set-prep -i {PATH TO DATASET DIRECTORY}
 The CLI will now begin the dataset generation process and the progress will be shown visually. THe output should look akin to this:
 
 <div align="center">
-  <img src="SampleOutputPolaris.png" alt="Dataset Prep Sample">
+  <img src="resources/SampleOutputPolaris.png" alt="Dataset Prep Sample">
 </div>
 
 <!-- USAGE EXAMPLES -->
@@ -119,12 +119,97 @@ The CLI will now begin the dataset generation process and the progress will be s
 
 To detect instances in a directory of IR images using the trained model:
 ```python
-python3 main.py predict -i {INPUT DIRECTORY OF IMAGES} -o {OUTPUT DIRECTORY}
+python3 main.py predict -i {INPUT DIRECTORY OF IMAGES} -o {OUTPUT DIRECTORY} -s {FLAG FOR SAVING THE OUTPUT IMAGES OR NOT}
 ```
-The results will be saved in the passed directory in the form of images and annotations superimposed over any detected objects.
+The results will be saved in the passed directory in the form of images(if flag is set) and annotations in the form of a JSON file in an MSCOCO-like format.
+
 Sample ```images``` and ```out``` directory are placed in the repository with 10 images. The results are saved as individual images matching the names of the input images.
 
-**[FILL IN THE TRACKING STUFF + JSON PROCESSING]**
+The output directory will contain a json file that has the results of prediction of the 8 different classes according to the order of the images (based on alphapitcal, natural sorting of the names of the folders to be exact). The json file is structured as follows:
+```json
+{
+    "info": {
+        "contributor": "Polaris",
+        "date_created": DATE,
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "categories": [
+        {
+            "id": 1,
+            "name": "Person",
+            "supercategory": ""
+        },
+        {
+            "id": 2,
+            "name": "offroad_vehicle",
+            "supercategory": ""
+        },
+        {
+            "id": 3,
+            "name": "Motorcyclist",
+            "supercategory": ""
+        },
+        {
+            "id": 4,
+            "name": "ATV driver",
+            "supercategory": ""
+        },
+        {
+            "id": 5,
+            "name": "None",
+            "supercategory": ""
+        },
+        {
+            "id": 6,
+            "name": "Car",
+            "supercategory": ""
+        },
+        {
+            "id": 7,
+            "name": "Bus",
+            "supercategory": ""
+        },
+        {
+            "id": 8,
+            "name": "Truck",
+            "supercategory": ""
+        },
+    ],
+    "images": [
+        {
+            "id": ID,
+            "width": 640,
+            "height": 512,
+            "file_name": FILE_NAME,
+            "license": 0,
+            "flickr_url": "",
+            "coco_url": "",
+            "date_captured": 0
+        },
+    ],
+    "annotations": [
+        {
+          "id": ID,
+          "image_id": IMAGE_ID,
+          "category": ,
+          "bbox": [
+              Top Left X,
+              Top Left Y,
+              Width,
+              Height
+          ],
+          "extra_dict": {}
+        }
+    ],
+}
+```
+
+As for the tracking pipeline, the results are stored as follow:
+
+**[FILL IN THE TRACKING JSON FORMAT HERE PLEASE]**
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
