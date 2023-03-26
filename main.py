@@ -237,7 +237,7 @@ def cleanup_files(input_folder):
     shutil.rmtree(os.path.join(input_folder, "Nighttime/images"), ignore_errors=True)
     shutil.rmtree(os.path.join(input_folder, "Nighttime/annotations"), ignore_errors=True)
 
-def process_content(inputpath, outputpath):
+def process_content(inputpath:str, outputpath:str, save_images:bool):
     # Preprocess the total files count
     img_list = []
     for filepath in tqdm(get_images(inputpath), unit="image"):
@@ -246,7 +246,7 @@ def process_content(inputpath, outputpath):
     print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING MODEL ON ALL IMAGES NOW....")
     img_list = natural_sort(img_list)
     for i, image in tqdm(enumerate(img_list, start=1), total=len(img_list), unit="images"):
-        cur_res = polfuncs.get_preds(image, outputpath, image_num=int(image.split("/")[-1].split(".")[0]), image_name = image.split("/")[-1], save_files=False)
+        polfuncs.get_preds(image, outputpath, image_num=int(image.split("/")[-1].split(".")[0]), image_name = image.split("/")[-1], save_files=save_images)
             
     
     print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{os.path.abspath(outputpath)}]!")
@@ -264,6 +264,7 @@ def _main(parser=argparse.ArgumentParser()):
     predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
     
     predict.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
+    predict.add_argument("-s", "--save_images", help="Save annotated images in the passed directory or not", type=bool, required=False, default=False)
     
     prepare_set.add_argument("-i", "--input_path", help="Path to the input dataset directory", type=str, required=True)
 
@@ -272,7 +273,7 @@ def _main(parser=argparse.ArgumentParser()):
     if args.command == 'predict':
         try:
             check_if_folder(args.input_path, args.output_path)
-            process_content(args.input_path, args.output_path)
+            process_content(args.input_path, args.output_path, args.save_images)
         except InputDirectoryException:
             print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
         except OutputDirectoryException:

@@ -7,6 +7,8 @@ import json
 from datetime import datetime
 from tqdm import tqdm
 from ultralytics import YOLO
+from ultralytics.yolo.engine import results
+
 
 # Get the path of this file and use it to find the model to load
 cur_path = os.path.dirname(__file__)
@@ -164,13 +166,13 @@ def get_preds(image: str, out:str, image_num:int, image_name:str , save_files:bo
         if (save_files):
             cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
         
-        for box in r.boxes:
+        for box in reversed(r.boxes):
             bbox=box.xyxy.tolist()[0]
             temp_pred = {
             "id": count,
             "image_id": image_num,
             "category_id": int(box.cls.item())+1,
-            "bbox": bbox,
+            "bbox": [bbox[0], bbox[1], bbox[2]-bbox[0], bbox[3]-bbox[1]],
             # "confidence": box.conf.item(),
             "extra_dict": {}
             }

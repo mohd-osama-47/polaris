@@ -11,8 +11,11 @@ import fiftyone as fo
 name = "custom_set"
 
 # The directory containing the dataset to import
-IMAGES_DIR = "../Sample_dataset/final/images"
-LABELS_DIR = "../Sample_dataset/final/annotations/coco_annotation.json"
+# IMAGES_DIR = "../Sample_dataset/final/images"
+# LABELS_DIR = "../Sample_dataset/final/annotations/coco_annotation.json"
+
+IMAGES_DIR = "images/"
+LABELS_DIR = "out/output.json"
 
 # The splits to load
 splits = ["train", "val"]
