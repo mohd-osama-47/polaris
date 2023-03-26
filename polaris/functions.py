@@ -4,6 +4,7 @@ import os
 import sys
 import cv2
 import json
+from datetime import datetime
 from tqdm import tqdm
 from ultralytics import YOLO
 
@@ -13,13 +14,173 @@ cur_path = os.path.dirname(__file__)
 # Load a model
 model = YOLO(os.path.join(cur_path, 'model/model_weights.pt'))  # load the trained model
 
-def get_preds(image: str, out)->list:
+# For tracking:
+# json_out = {
+#     "info": {
+#         "contributor": "Polaris",
+#         "date_created": str(datetime.now()),
+#         "description": "",
+#         "url": "",
+#         "version": "",
+#         "year": ""
+#     },
+#     "objects_tracked": [],
+#     "images": [],
+#     "predictions": [],
+# }
+
+
+CLASSES_DICT = {
+    0:"Person",
+    1:"offroad_vehicle",
+    2:"Motorcyclist",
+    3:"ATV driver",
+    4:"None",
+    5:"Car",
+    6:"Bus",
+    7:"Truck"
+}
+# For predictions:
+json_out = {
+    "info": {
+        "contributor": "Polaris",
+        "date_created": str(datetime.now()),
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "categories": [
+        {
+            "id": 1,
+            "name": "Person",
+            "supercategory": ""
+        },
+        {
+            "id": 2,
+            "name": "offroad_vehicle",
+            "supercategory": ""
+        },
+        {
+            "id": 3,
+            "name": "Motorcyclist",
+            "supercategory": ""
+        },
+        {
+            "id": 4,
+            "name": "ATV driver",
+            "supercategory": ""
+        },
+        {
+            "id": 5,
+            "name": "None",
+            "supercategory": ""
+        },
+        {
+            "id": 6,
+            "name": "Car",
+            "supercategory": ""
+        },
+        {
+            "id": 7,
+            "name": "Bus",
+            "supercategory": ""
+        },
+        {
+            "id": 8,
+            "name": "Truck",
+            "supercategory": ""
+        },
+    ],
+    "images": [],
+    "annotations": [],
+}
+
+'''
+"images": [
+    {
+        "id": 1,
+        "width": 640,
+        "height": 512,
+        "file_name": "image0001.png",
+        "license": 0,
+        "flickr_url": "",
+        "coco_url": "",
+        "date_captured": 0
+    },
+]
+'''
+# #! Template of json detection out:
+# temp_pred = {
+#     "id": None,
+#     "image_id": None,
+#     "predicted_object_id": None,
+#     "bbox": [
+#         None,   #Top Left X
+#         None,   #Top Left Y
+#         None,   #Width
+#         None    #Height
+#     ],
+#     "confidence": 0.87,
+#     "extra_dict": {}
+# }
+
+# #! Template of json image out:
+# temp_image = {
+#         "id": 0,
+#         "width": 0,
+#         "height": 0,
+#         "file_name": "",
+#         "license": 0,
+#         "flickr_url": "",
+#         "coco_url": "",
+#         "date_captured": 0
+#     }
+
+def get_preds(image: str, out:str, image_num:int, image_name:str , save_files:bool=False)->list:
     '''
     Runs YOLOv8 predictions on the supplied image directory and saves to where the user desires the output
     '''
     res = model.predict(image, verbose=False, stream=True)
-    for r in res:
-        cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
+    temp_image = {
+        "id": image_num,
+        "width": 640,
+        "height": 512,
+        "file_name": image_name,
+        "license": 0,
+        "flickr_url": "",
+        "coco_url": "",
+        "date_captured": 0
+    }
+    json_out["images"].append(temp_image)
+
+    try:
+        with open(os.path.join(out,"output.json"), "r") as outfile:
+            count = json.load(outfile)["annotations"][-1]["id"]+1
+    except FileNotFoundError:
+        count = 1
+    
+    for i, r in enumerate(res,1):
+        if (save_files):
+            cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
+        
+        for box in r.boxes:
+            bbox=box.xyxy.tolist()[0]
+            temp_pred = {
+            "id": count,
+            "image_id": image_num,
+            "category_id": int(box.cls.item())+1,
+            "bbox": bbox,
+            # "confidence": box.conf.item(),
+            "extra_dict": {}
+            }
+            json_out["annotations"].append(temp_pred)
+            count+=1
+    
+    with open(os.path.join(out,"output.json"), "w") as outfile:
+        outfile.write(json.dumps(json_out, indent = 4))
+        
+        
 
 
 # The following functionality is taken from the GitHub repo: 

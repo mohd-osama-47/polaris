@@ -6,6 +6,8 @@ from tqdm import tqdm, trange
 import polaris
 import shutil
 from polaris import functions as polfuncs
+import re
+
 
 VALID_IMAGES = ["jpg","png"]
 
@@ -18,6 +20,10 @@ class OutputDirectoryException(Exception):
 class DatasetDirectoryException(Exception):
     pass
 
+def natural_sort(l): 
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
 
 def get_images(folder):
     """Get all images that can be manipulated in the passed folder ONLY"""
@@ -238,9 +244,9 @@ def process_content(inputpath, outputpath):
         img_list.append(filepath)
 
     print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING MODEL ON ALL IMAGES NOW....")
-    img_list_res = []
-    for image in tqdm(img_list, total=len(img_list), unit="images"):
-        cur_res = polfuncs.get_preds(image, outputpath)
+    img_list = natural_sort(img_list)
+    for i, image in tqdm(enumerate(img_list, start=1), total=len(img_list), unit="images"):
+        cur_res = polfuncs.get_preds(image, outputpath, image_num=int(image.split("/")[-1].split(".")[0]), image_name = image.split("/")[-1], save_files=False)
             
     
     print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{os.path.abspath(outputpath)}]!")
