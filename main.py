@@ -25,7 +25,7 @@ def natural_sort(l):
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
     return sorted(l, key=alphanum_key)
 
-def get_images(folder):
+def get_images(folder:str):
     """Get all images that can be manipulated in the passed folder ONLY"""
     for item in os.listdir(folder):
         if os.path.isfile(os.path.join(folder, item)):
@@ -48,7 +48,7 @@ def check_dataset_folder(folder_in):
     if not os.path.isdir(folder_in):
         raise InputDirectoryException
     dataset_structure = {}
-    for dirpath, dirs, files in tqdm(os.walk(folder_in), unit="folders"):
+    for dirpath, dirs, files in tqdm(os.walk(folder_in), unit="folders", colour='green'):
         # print(f"AT:{dirpath}, DIRECTORIES ARE:{dirs}, AND FILES ARE:")
         dataset_structure[dirpath] = dirs
     
@@ -65,7 +65,7 @@ def preprocess_dataset_directory(folder_in):
         # zip_ref.extractall(os.path.join(folder_in, 'Daytime/images'))
 
         # Loop over each file
-        for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist()), unit="images"):
+        for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist()), unit="images", colour='green'):
             # Extract each file to another directory
             # If you want to extract to current working directory, don't specify path
             zip_ref.extract(member=file, path=os.path.join(folder_in, 'Daytime/'))
@@ -91,7 +91,7 @@ def preprocess_dataset_directory(folder_in):
         # zip_ref.extractall(os.path.join(folder_in, 'Nighttime/images'))
 
         # Loop over each file
-        for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist()), unit="folders"):
+        for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist()), unit="folders", colour='green'):
             zip_ref.extract(member=file, path=os.path.join(folder_in, 'Nighttime/'))
 
     # os.rename(os.path.join(folder_in, 'Nighttime/IR'), "images")
@@ -211,7 +211,7 @@ def datum_pipeline(folder_in):
     final_dataset.export(f'{folder_in}/final', 'coco_instances', save_media=True)
     
     # this here moves the files to more conveniently labeled directories
-    for file in tqdm(os.listdir(os.path.join(folder_in,'final/images/default')), unit="image"):
+    for file in tqdm(os.listdir(os.path.join(folder_in,'final/images/default')), unit="image", colour='green'):
         file_name = os.path.join(os.path.join(folder_in,'final/images/default'), file)
         shutil.move(file_name, os.path.join(folder_in,'final/images'))
     os.removedirs(os.path.join(folder_in,'final/images/default'))
@@ -240,13 +240,14 @@ def cleanup_files(input_folder):
 def process_content(inputpath:str, outputpath:str, save_images:bool):
     # Preprocess the total files count
     img_list = []
-    for filepath in tqdm(get_images(inputpath), unit="image"):
+    for filepath in tqdm(get_images(inputpath), unit="image", colour='green'):
         img_list.append(filepath)
 
     print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING MODEL ON ALL IMAGES NOW....")
     img_list = natural_sort(img_list)
-    for i, image in tqdm(enumerate(img_list, start=1), total=len(img_list), unit="images"):
-        polfuncs.get_preds(image, outputpath, image_num=int(image.split("/")[-1].split(".")[0]), image_name = image.split("/")[-1], save_files=save_images)
+    # for i, image in tqdm(enumerate(img_list, start=1), total=len(img_list), unit="images"):
+    #     polfuncs.get_preds(image, outputpath, image_num=int(image.split("/")[-1].split(".")[0]), image_name = image.split("/")[-1], save_files=save_images)
+    polfuncs.get_preds(img_list, outputpath, save_images)
             
     
     print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{os.path.abspath(outputpath)}]!")
@@ -264,8 +265,8 @@ def _main(parser=argparse.ArgumentParser()):
     predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
     
     predict.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
-    predict.add_argument("-s", "--save_images", help="Save annotated images in the passed directory or not", type=bool, required=False, default=False)
-    
+    predict.add_argument("--save-images", help="Save annotated images in the passed directory", action='store_true')
+    parser.set_defaults(save_images=False)
     prepare_set.add_argument("-i", "--input_path", help="Path to the input dataset directory", type=str, required=True)
 
     args = parser.parse_args()

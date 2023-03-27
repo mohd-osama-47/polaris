@@ -138,47 +138,44 @@ json_out = {
 #         "coco_url": "",
 #         "date_captured": 0
 #     }
-
-def get_preds(image: str, out:str, image_num:int, image_name:str , save_files:bool=False)->list:
+def get_preds(images: list, out:str, save_files:bool=False)->list:
     '''
     Runs YOLOv8 predictions on the supplied image directory and saves to where the user desires the output
     '''
-    res = model.predict(image, verbose=False, stream=True)
-    temp_image = {
-        "id": image_num,
-        "width": 640,
-        "height": 512,
-        "file_name": image_name,
-        "license": 0,
-        "flickr_url": "",
-        "coco_url": "",
-        "date_captured": 0
-    }
-    json_out["images"].append(temp_image)
-
-    try:
-        with open(os.path.join(out,"output.json"), "r") as outfile:
-            count = json.load(outfile)["annotations"][-1]["id"]+1
-    except FileNotFoundError:
-        count = 1
-    
-    for i, r in enumerate(res,1):
-        if (save_files):
-            cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
+    count = 1
+    for image_num, image in tqdm(enumerate(images, start=1), total=len(images), unit="images", colour='green'):
+        res = model.predict(image, verbose=False, stream=True, device="0")
+        temp_image = {
+            "id": image_num,
+            "width": 640,
+            "height": 512,
+            "file_name": image.split("/")[-1],
+            "license": 0,
+            "flickr_url": "",
+            "coco_url": "",
+            "date_captured": 0
+        }
+        json_out["images"].append(temp_image)
         
-        for box in reversed(r.boxes):
-            bbox=box.xyxy.tolist()[0]
-            temp_pred = {
-            "id": count,
-            "image_id": image_num,
-            "category_id": int(box.cls.item())+1,
-            "bbox": [bbox[0], bbox[1], bbox[2]-bbox[0], bbox[3]-bbox[1]],
-            # "confidence": box.conf.item(),
-            "extra_dict": {}
-            }
-            json_out["annotations"].append(temp_pred)
-            count+=1
-    
+        for i, r in enumerate(res,1):
+            if (save_files):
+                cv2.imwrite(os.path.join(out,r.path.split("/")[-1]), r.plot())
+            
+            for box in r.boxes:
+                bbox=box.xyxy.tolist()[0]
+                temp_pred = {
+                "id": count,
+                "image_id": image_num,
+                "category_id": int(box.cls.item())+1,
+                "bbox": [bbox[0], bbox[1], bbox[2]-bbox[0], bbox[3]-bbox[1]],
+                # "confidence": box.conf.item(),
+                "extra_dict": {
+                    "confidence": box.conf.item(),
+                }
+                }
+                json_out["annotations"].append(temp_pred)
+                count+=1
+        
     with open(os.path.join(out,"output.json"), "w") as outfile:
         outfile.write(json.dumps(json_out, indent = 4))
         
@@ -327,7 +324,7 @@ def combine(tt1,tt2,output_file):
         d2['annotations'][i]['image_id']=b2[d2['annotations'][i]['image_id']]
 
     files_check_classes_temp={}
-    pbar = tqdm(total=len(d1['images'])+len(d2['images']))
+    pbar = tqdm(total=len(d1['images'])+len(d2['images']), colour='green')
     for i,j in enumerate(d1['images']):
         for ii,jj in enumerate(d1['annotations']):
             if jj['image_id']==j['id']:
@@ -357,7 +354,7 @@ def combine(tt1,tt2,output_file):
         test['annotations'].append(i)
     test['categories']=d2['categories']
     files_check_classes_temp={}
-    pbar = tqdm(total=len(test['images']))
+    pbar = tqdm(total=len(test['images']), colour='green')
     for i,j in enumerate(test['images']):
         for ii,jj in enumerate(test['annotations']):
             if jj['image_id']==j['id']:

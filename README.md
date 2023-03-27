@@ -54,8 +54,8 @@ Here is team Polaris' attempt at solving the infra-red vision challenge by TII! 
 ## Getting Started
 The repository contains tools and functionality that was used by the Polaris team to generate a combined dataset of both day and night annotated IR samples, as well as model prediction outputs of the trained model and the weights of said model. This functionality will be explored in this readme file.
 
+___
 ### Dataset Prerequisites
-
 **OPTIONAL: Generating the training dataset**
 
 For generating the dataset used for training, a custom Python CLI is developed here that takes the original sample dataset provided by TII and does the work in place. The CLI expects the file structure to match what was passed by the TII team. This functionality is added here to show the approach the team has taken to generate a merged dataset containing all 14,207 annotated images of day and night IR samples.
@@ -84,9 +84,12 @@ The use of a virtual environment is **highly** recommended to account for the cu
 ```bash
 python3 -m virtualenv venv
 ```
-
-
-Install the requirements by running the following:
+and then sourve the virtual environment:
+```bash
+. venv/bin/activate
+```
+____
+Install the requirements by running the following after ```cd```ing into the repository's directory:
 ```sh
 python3 -m pip install -r requirements.txt
 ```
@@ -101,7 +104,7 @@ assert name not in self._indices, name #! << Comment this line please!
 
 This is done to ensure that the original dataset works with the Datumaro dataset management framework without extensively changing the original json file of the annotations.
 
-One more edit that is necessary for the dataset generation and merger to work out is to fill in a missing super category present in the night dataset under id No. 11 (Person6) to be "person" since it was missing in the original annotation file.
+One more edit that is necessary for the dataset generation and merger to work out is to fill in a **missing super category present in the night dataset under id No. 11 (Person6) to be "person"** since it was missing in the original annotation file.
 
 At the root of the project's directory, run the following to start the generation process:
 
@@ -119,13 +122,13 @@ The CLI will now begin the dataset generation process and the progress will be s
 
 To detect instances in a directory of IR images using the trained model:
 ```python
-python3 main.py predict -i {INPUT DIRECTORY OF IMAGES} -o {OUTPUT DIRECTORY} -s {FLAG FOR SAVING THE OUTPUT IMAGES OR NOT}
+python3 main.py predict -i {INPUT DIR OF IMAGES} -o {OUTPUT DIR} --save-images {OPTIONAL FLAG}
 ```
-The results will be saved in the passed directory in the form of images(if flag is set) and annotations in the form of a JSON file in an MSCOCO-like format.
+The results will be saved in the passed directory in the form of images (if is set) and annotations in the form of a JSON file in an MSCOCO-like format.
 
 Sample ```images``` and ```out``` directory are placed in the repository with 10 images. The results are saved as individual images matching the names of the input images.
 
-The output directory will contain a json file that has the results of prediction of the 8 different classes according to the order of the images (based on alphapitcal, natural sorting of the names of the folders to be exact). The json file is structured as follows:
+The output directory will contain a json file that has the results of prediction of the 8 different classes according to the order of the images (based on alphabetical, natural sorting of the names of the folders to be exact). The json file is structured as follows:
 ```json
 {
     "info": {
@@ -201,7 +204,9 @@ The output directory will contain a json file that has the results of prediction
               Width,
               Height
           ],
-          "extra_dict": {}
+          "extra_dict": {
+            "confidence": ,
+          }
         }
     ],
 }

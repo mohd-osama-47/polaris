@@ -8,34 +8,19 @@ and then run this python file and you should get a web page that visualizes the 
 import fiftyone as fo
 
 # A name for the dataset
-name = "custom_set"
+name = "sample_subset"
 
 # The directory containing the dataset to import
-# IMAGES_DIR = "../Sample_dataset/final/images"
-# LABELS_DIR = "../Sample_dataset/final/annotations/coco_annotation.json"
 
-IMAGES_DIR = "images/"
-LABELS_DIR = "out/output.json"
-
-# The splits to load
-splits = ["train", "val"]
-
-
-# Load the dataset, using tags to mark the samples in each split
-# dataset = fo.Dataset(name)
-# for split in splits:
-#     dataset.add_dir(
-#         dataset_dir=dataset_dir,
-#         dataset_type=fo.types.YOLOv5Dataset,
-#         split=split,
-#         tags=split,
-# )
+IMAGES_DIR = "images"          # INPUT DIRECTORY OF IMAGES
+LABELS_DIR = "out/output.json" # JSON DIRECTORY FOR PREDICTIONS
 
 coco_dataset = fo.Dataset.from_dir(
     dataset_type=fo.types.COCODetectionDataset,
     data_path=IMAGES_DIR,
     labels_path=LABELS_DIR,
     include_id=True,
+    name=name,
 )
 
 session = fo.launch_app(coco_dataset)
