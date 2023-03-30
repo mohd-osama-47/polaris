@@ -4,11 +4,19 @@ import os
 import sys
 import cv2
 import json
-from datetime import datetime
+import torch
+import platform
 from tqdm import tqdm
+from pathlib import Path
 from ultralytics import YOLO
-from ultralytics.yolo.engine import results
-
+from datetime import datetime
+from ultralytics.yolo.utils import LOGGER
+from yolov8_tracking.trackers.multi_tracker_zoo import create_tracker
+from ultralytics.yolo.utils.checks import check_imgsz
+from ultralytics.yolo.utils.files import increment_path
+from ultralytics.yolo.data.dataloaders.stream_loaders import LoadImages
+from ultralytics.yolo.utils.plotting import Annotator, colors, save_one_box
+from ultralytics.yolo.utils.ops import Profile, scale_boxes, non_max_suppression
 
 # Get the path of this file and use it to find the model to load
 cur_path = os.path.dirname(__file__)
@@ -179,8 +187,156 @@ def get_preds(images: list, out:str, save_files:bool=False)->list:
     with open(os.path.join(out,"output.json"), "w") as outfile:
         outfile.write(json.dumps(json_out, indent = 4))
         
-        
+def run_tracker(images: list, out:str, save_files:bool=False)->list:
+    '''
+    Runs YOLOv8 tracker on the supplied image directory and saves to where the user desires the output
+    '''
+    stride, names, pt = model.model.stride, model.model.names, False
+    imgsz = check_imgsz([640, 512], stride=stride)  # check image size
+    count = 1
+    bs = 1
+    dataset = LoadImages(
+        images,
+        imgsz=imgsz,
+        stride=stride,
+        auto=pt,
+        transforms=getattr(model.model, 'transforms', None),
+        vid_stride=1
+    )
+    txt_path = [None] * bs
+    # model.model.warmup(imgsz=(1 if pt or model.model.triton else bs, 3, *imgsz))  # warmup
 
+    tracking_method='strongsort'
+    tracking_config=None
+    reid_weights='model/osnet_x0_25_msmt17.pt'
+    device='0'
+    half=False
+
+    conf_thres=0.25  # confidence threshold
+    iou_thres=0.45,  # NMS IOU threshold
+    classes=None     # filter 
+    agnostic_nms=False,  # class-agnostic NMS
+    max_det=1000,  # maximum detections per image
+    # Create as many strong sort instances as there are video sources
+    tracker_list = []
+    for i in range(bs):
+        tracker = create_tracker(tracking_method, tracking_config, reid_weights, device, half)
+        tracker_list.append(tracker, )
+        if hasattr(tracker_list[i], 'model'):
+            if hasattr(tracker_list[i].model, 'warmup'):
+                tracker_list[i].model.warmup()
+    outputs = [None] * bs
+
+    # Run tracking
+    seen, windows, dt = 0, [], (Profile(), Profile(), Profile(), Profile())
+    curr_frames, prev_frames = [None] * bs, [None] * bs
+    for frame_idx, batch in enumerate(dataset):
+        path, im, im0s, vid_cap, s = batch
+        visualize = False
+        with dt[0]:
+            im = torch.from_numpy(im).to(device)
+            im = im.half() if half else im.float()  # uint8 to fp16/32
+            im /= 255.0  # 0 - 255 to 0.0 - 1.0
+            if len(im.shape) == 3:
+                im = im[None]  # expand for batch dim
+        
+        # Inference
+        with dt[1]:
+            preds = model(im, augment=False, visualize=visualize)
+        
+        # Apply NMS
+        with dt[2]:
+            p = non_max_suppression(preds, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
+        
+        # Process detections
+        for i, det in enumerate(p):  # detections per image
+            seen += 1
+            p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
+            p = Path(p)  # to Path
+            # folder with imgs
+            txt_file_name = p.parent.name  # get folder name containing current img
+            save_path = str(out / p.parent.name)  # im.jpg, vid.mp4, ...
+        
+        curr_frames[i] = im0
+        txt_path = str(out / 'tracks' / txt_file_name)  # im.txt
+        s += '%gx%g ' % im.shape[2:]  # print string
+        imc = im0  # for save_crop
+        annotator = Annotator(im0, line_width=2, example=str(names))
+
+        if hasattr(tracker_list[i], 'tracker') and hasattr(tracker_list[i].tracker, 'camera_update'):
+            if prev_frames[i] is not None and curr_frames[i] is not None:  # camera motion compensation
+                tracker_list[i].tracker.camera_update(prev_frames[i], curr_frames[i])
+        
+        if det is not None and len(det):
+            det[:, :4] = scale_boxes(im.shape[2:], det[:, :4], im0.shape).round()  # rescale boxes to im0 size
+
+            # Print results
+            for c in det[:, 5].unique():
+                n = (det[:, 5] == c).sum()  # detections per class
+                s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
+            
+            # pass detections to strongsort
+            with dt[3]:
+                outputs[i] = tracker_list[i].update(det.cpu(), im0)
+
+            # draw boxes for visualization
+            if len(outputs[i]) > 0:
+                for j, (output) in enumerate(outputs[i]):
+                    bbox = output[0:4]
+                    id = output[4]
+                    cls = output[5]
+                    conf = output[6]
+
+                    #! TEMP
+                    if False:
+                        # to MOT format
+                        bbox_left = output[0]
+                        bbox_top = output[1]
+                        bbox_w = output[2] - output[0]
+                        bbox_h = output[3] - output[1]
+                        # Write MOT compliant results to file
+                        with open(txt_path + '.txt', 'a') as f:
+                            f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
+                                                            bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
+
+                    if True:
+                        c = int(cls)  # integer class
+                        id = int(id)  # integer id
+                        label = f'{id} {names[c]} {conf:.2f}'
+                        color = colors(c, True)
+                        annotator.box_label(bbox, label, color=color)
+                        #! TEMP SAVE save_trajectories=False, save_crop=False
+                        if False and tracking_method == 'strongsort':
+                            q = output[7]
+                            tracker_list[i].trajectory(im0, q, color=color)
+                        if False:
+                            txt_file_name = txt_file_name if (isinstance(path, list) and len(path) > 1) else ''
+                            save_one_box(np.array(bbox, dtype=np.int16), imc, file=save_dir / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
+        else:
+            pass
+            
+        # Stream results
+        im0 = annotator.result()
+        if True:
+            if platform.system() == 'Linux' and p not in windows:
+                windows.append(p)
+                cv2.namedWindow(str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)  # allow window resize (Linux)
+                cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
+            cv2.imshow(str(p), im0)
+            if cv2.waitKey(1) == ord('q'):  # 1 millisecond
+                exit()
+        
+        prev_frames[i] = curr_frames[i]
+
+        # Print total time (preprocessing + inference + NMS + tracking)
+        LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{sum([dt.dt for dt in dt if hasattr(dt, 'dt')]) * 1E3:.1f}ms")
+    
+    # Print results
+    t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
+    LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms {tracking_method} update per image at shape {(1, 3, *imgsz)}' % t)
+    
+    s = f"\n{len(list((out / 'tracks').glob('*.txt')))} tracks saved to {out / 'tracks'}" 
+    LOGGER.info(f"Results saved to {out}{s}")
 
 # The following functionality is taken from the GitHub repo: 
 

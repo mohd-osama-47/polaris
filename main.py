@@ -6,8 +6,10 @@ from tqdm import tqdm, trange
 import polaris
 import shutil
 from polaris import functions as polfuncs
+from polaris import _track as trackfuncs
 import re
-
+import time
+from pathlib import Path
 
 VALID_IMAGES = ["jpg","png"]
 
@@ -242,7 +244,7 @@ def process_content(inputpath:str, outputpath:str, save_images:bool):
     img_list = []
     for filepath in tqdm(get_images(inputpath), unit="image", colour='green'):
         img_list.append(filepath)
-
+    # polfuncs.load_model()
     print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING MODEL ON ALL IMAGES NOW....")
     img_list = natural_sort(img_list)
     # for i, image in tqdm(enumerate(img_list, start=1), total=len(img_list), unit="images"):
@@ -252,6 +254,15 @@ def process_content(inputpath:str, outputpath:str, save_images:bool):
     
     print(f"[INFO] IMAGES WITH PREDICTIONS SAVED AT DIRECTORY [{os.path.abspath(outputpath)}]!")
 
+def process_tracking(inputpath:str, outputpath:str, save_images:bool):
+    # Preprocess the total files count
+    img_list = []
+    for filepath in tqdm(get_images(inputpath), unit="image", colour='green'):
+        img_list.append(filepath)
+
+    print(f"[INFO] FOUND {len(img_list)} VALID IMAGES IN [{os.path.abspath(inputpath)}], RUNNING TRACKING ON ALL IMAGES NOW....")
+
+    polfuncs.run_tracker(img_list, outputpath)
 
 def _main(parser=argparse.ArgumentParser()):
 
@@ -259,22 +270,38 @@ def _main(parser=argparse.ArgumentParser()):
     subparser = parser.add_subparsers(dest='command')
 
     predict = subparser.add_parser("predict", help="Run model on a directory of images and same the results on a passed folder")
+    track = subparser.add_parser("track", help="Run tracking on a directory of images and save the results to output directory")
 
     prepare_set = subparser.add_parser("set-prep", help="Given the supplied dataset, prepare the dataset to follow yolo convention and merge all categories to their respective super-category")
     
     predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
-    
     predict.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
     predict.add_argument("--save-images", help="Save annotated images in the passed directory", action='store_true')
     parser.set_defaults(save_images=False)
+    
+    
+    track.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
+    track.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
+    track.add_argument("--save-images", help="Save annotated images in the passed directory", action='store_true')
+    parser.set_defaults(save_images=False)
+    
     prepare_set.add_argument("-i", "--input_path", help="Path to the input dataset directory", type=str, required=True)
 
     args = parser.parse_args()
-
+    
     if args.command == 'predict':
         try:
             check_if_folder(args.input_path, args.output_path)
             process_content(args.input_path, args.output_path, args.save_images)
+        except InputDirectoryException:
+            print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
+        except OutputDirectoryException:
+            print(f"[WARN] OUTPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
+
+    if args.command == 'track':
+        try:
+            check_if_folder(args.input_path, args.output_path)
+            process_tracking(args.input_path, args.output_path, args.save_images)
         except InputDirectoryException:
             print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
         except OutputDirectoryException:

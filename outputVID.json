@@ -1,0 +1,1025 @@
+{
+    "info": {
+        "contributor": "Polaris",
+        "date_created": "2023-03-30 15:33:51.488935",
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "objects_tracked": [],
+    "images": [
+        {
+            "id": 1,
+            "file_name": "image0.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 2,
+            "file_name": "image1.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 3,
+            "file_name": "image2.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 4,
+            "file_name": "image3.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 5,
+            "file_name": "image4.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 6,
+            "file_name": "image5.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 7,
+            "file_name": "image6.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 8,
+            "file_name": "image7.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 9,
+            "file_name": "image8.jpg",
+            "extra_dict": {}
+        },
+        {
+            "id": 10,
+            "file_name": "image9.jpg",
+            "extra_dict": {}
+        }
+    ],
+    "predictions": [
+        {
+            "id": 1,
+            "image_id": 1,
+            "predicted_object_id": 1,
+            "bbox": [
+                461.6107177734375,
+                175.5980224609375,
+                115.7333984375,
+                241.392333984375
+            ],
+            "confidence": 0.9435733556747437,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 2,
+            "image_id": 1,
+            "predicted_object_id": 2,
+            "bbox": [
+                5.549896240234375,
+                0.0,
+                403.8533630371094,
+                512.0
+            ],
+            "confidence": 0.9040411710739136,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 3,
+            "image_id": 1,
+            "predicted_object_id": 3,
+            "bbox": [
+                489.45318603515625,
+                232.84561157226562,
+                23.4207763671875,
+                24.05963134765625
+            ],
+            "confidence": 0.8879112601280212,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 4,
+            "image_id": 1,
+            "predicted_object_id": 4,
+            "bbox": [
+                467.619384765625,
+                256.37982177734375,
+                45.31036376953125,
+                24.236083984375
+            ],
+            "confidence": 0.887499213218689,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 5,
+            "image_id": 1,
+            "predicted_object_id": 5,
+            "bbox": [
+                351.06304931640625,
+                146.61239624023438,
+                76.8951416015625,
+                307.77252197265625
+            ],
+            "confidence": 0.8664073348045349,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 6,
+            "image_id": 2,
+            "predicted_object_id": 6,
+            "bbox": [
+                461.65478515625,
+                175.431884765625,
+                115.923095703125,
+                241.4990234375
+            ],
+            "confidence": 0.942836344242096,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 7,
+            "image_id": 2,
+            "predicted_object_id": 7,
+            "bbox": [
+                347.8940124511719,
+                145.0330810546875,
+                79.523193359375,
+                309.9088134765625
+            ],
+            "confidence": 0.9049610495567322,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 8,
+            "image_id": 2,
+            "predicted_object_id": 8,
+            "bbox": [
+                489.5433349609375,
+                232.77386474609375,
+                23.35015869140625,
+                24.06573486328125
+            ],
+            "confidence": 0.8885292410850525,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 9,
+            "image_id": 2,
+            "predicted_object_id": 9,
+            "bbox": [
+                467.7122802734375,
+                256.3463134765625,
+                45.2408447265625,
+                24.2315673828125
+            ],
+            "confidence": 0.8878335356712341,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 10,
+            "image_id": 2,
+            "predicted_object_id": 10,
+            "bbox": [
+                0.283355712890625,
+                0.0,
+                369.5399169921875,
+                511.4276123046875
+            ],
+            "confidence": 0.8861072659492493,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 11,
+            "image_id": 2,
+            "predicted_object_id": 11,
+            "bbox": [
+                0.06349754333496094,
+                98.13720703125,
+                59.24792671203613,
+                407.111572265625
+            ],
+            "confidence": 0.6888931393623352,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 12,
+            "image_id": 3,
+            "predicted_object_id": 12,
+            "bbox": [
+                461.513671875,
+                175.50137329101562,
+                116.1732177734375,
+                241.5106201171875
+            ],
+            "confidence": 0.9432747960090637,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 13,
+            "image_id": 3,
+            "predicted_object_id": 13,
+            "bbox": [
+                346.970947265625,
+                144.22027587890625,
+                80.799560546875,
+                310.14501953125
+            ],
+            "confidence": 0.9118826985359192,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 14,
+            "image_id": 3,
+            "predicted_object_id": 14,
+            "bbox": [
+                0.0,
+                0.0,
+                326.0650329589844,
+                512.0
+            ],
+            "confidence": 0.9021250009536743,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 15,
+            "image_id": 3,
+            "predicted_object_id": 15,
+            "bbox": [
+                489.611328125,
+                232.8583984375,
+                23.2890625,
+                24.00164794921875
+            ],
+            "confidence": 0.888635516166687,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 16,
+            "image_id": 3,
+            "predicted_object_id": 16,
+            "bbox": [
+                467.852783203125,
+                256.47760009765625,
+                45.02685546875,
+                24.1546630859375
+            ],
+            "confidence": 0.8854445815086365,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 17,
+            "image_id": 4,
+            "predicted_object_id": 17,
+            "bbox": [
+                461.40625,
+                175.27520751953125,
+                116.12158203125,
+                241.68658447265625
+            ],
+            "confidence": 0.9434325695037842,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 18,
+            "image_id": 4,
+            "predicted_object_id": 18,
+            "bbox": [
+                0.025238037109375,
+                0.0,
+                288.3580627441406,
+                510.90472412109375
+            ],
+            "confidence": 0.9260509014129639,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 19,
+            "image_id": 4,
+            "predicted_object_id": 19,
+            "bbox": [
+                347.69146728515625,
+                144.39111328125,
+                79.6937255859375,
+                309.6632080078125
+            ],
+            "confidence": 0.913776695728302,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 20,
+            "image_id": 4,
+            "predicted_object_id": 20,
+            "bbox": [
+                251.54266357421875,
+                167.01678466796875,
+                63.697021484375,
+                245.8763427734375
+            ],
+            "confidence": 0.8951310515403748,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 21,
+            "image_id": 4,
+            "predicted_object_id": 21,
+            "bbox": [
+                489.6990966796875,
+                232.8414306640625,
+                23.19183349609375,
+                24.105712890625
+            ],
+            "confidence": 0.88762366771698,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 22,
+            "image_id": 4,
+            "predicted_object_id": 22,
+            "bbox": [
+                467.82977294921875,
+                256.5558166503906,
+                44.959228515625,
+                23.979248046875
+            ],
+            "confidence": 0.8868963718414307,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 23,
+            "image_id": 5,
+            "predicted_object_id": 23,
+            "bbox": [
+                461.46197509765625,
+                175.44891357421875,
+                116.5067138671875,
+                241.40106201171875
+            ],
+            "confidence": 0.9422798752784729,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 24,
+            "image_id": 5,
+            "predicted_object_id": 24,
+            "bbox": [
+                346.98974609375,
+                144.630859375,
+                80.786865234375,
+                309.5093994140625
+            ],
+            "confidence": 0.9142565131187439,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 25,
+            "image_id": 5,
+            "predicted_object_id": 25,
+            "bbox": [
+                0.574951171875,
+                0.0,
+                258.29827880859375,
+                512.0
+            ],
+            "confidence": 0.9018948674201965,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 26,
+            "image_id": 5,
+            "predicted_object_id": 26,
+            "bbox": [
+                232.51675415039062,
+                166.12786865234375,
+                83.9296875,
+                248.3233642578125
+            ],
+            "confidence": 0.9006370306015015,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 27,
+            "image_id": 5,
+            "predicted_object_id": 27,
+            "bbox": [
+                468.0582275390625,
+                256.5830078125,
+                44.8187255859375,
+                23.9241943359375
+            ],
+            "confidence": 0.886891782283783,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 28,
+            "image_id": 5,
+            "predicted_object_id": 28,
+            "bbox": [
+                489.69683837890625,
+                232.84869384765625,
+                23.0811767578125,
+                24.01708984375
+            ],
+            "confidence": 0.8847721815109253,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 29,
+            "image_id": 6,
+            "predicted_object_id": 29,
+            "bbox": [
+                461.518798828125,
+                175.6712646484375,
+                116.11328125,
+                241.20672607421875
+            ],
+            "confidence": 0.9406342506408691,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 30,
+            "image_id": 6,
+            "predicted_object_id": 30,
+            "bbox": [
+                231.70260620117188,
+                165.90188598632812,
+                86.28369140625,
+                249.67950439453125
+            ],
+            "confidence": 0.9183456301689148,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 31,
+            "image_id": 6,
+            "predicted_object_id": 31,
+            "bbox": [
+                347.9248962402344,
+                144.7137451171875,
+                80.01458740234375,
+                309.00799560546875
+            ],
+            "confidence": 0.9168500900268555,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 32,
+            "image_id": 6,
+            "predicted_object_id": 32,
+            "bbox": [
+                208.218505859375,
+                225.35244750976562,
+                49.067474365234375,
+                106.63421630859375
+            ],
+            "confidence": 0.9006614685058594,
+            "extra_dict": {
+                "category_id": 3
+            }
+        },
+        {
+            "id": 33,
+            "image_id": 6,
+            "predicted_object_id": 33,
+            "bbox": [
+                0.0,
+                0.0408935546875,
+                239.6405029296875,
+                511.9591064453125
+            ],
+            "confidence": 0.8920064568519592,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 34,
+            "image_id": 6,
+            "predicted_object_id": 34,
+            "bbox": [
+                467.92144775390625,
+                256.55877685546875,
+                44.7198486328125,
+                23.96337890625
+            ],
+            "confidence": 0.8860267400741577,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 35,
+            "image_id": 6,
+            "predicted_object_id": 35,
+            "bbox": [
+                489.71337890625,
+                232.86080932617188,
+                23.00933837890625,
+                24.0697021484375
+            ],
+            "confidence": 0.8849945068359375,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 36,
+            "image_id": 7,
+            "predicted_object_id": 36,
+            "bbox": [
+                461.570556640625,
+                175.29681396484375,
+                116.291259765625,
+                241.4473876953125
+            ],
+            "confidence": 0.9412065744400024,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 37,
+            "image_id": 7,
+            "predicted_object_id": 37,
+            "bbox": [
+                231.03106689453125,
+                165.284423828125,
+                88.165771484375,
+                249.3516845703125
+            ],
+            "confidence": 0.9242390394210815,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 38,
+            "image_id": 7,
+            "predicted_object_id": 38,
+            "bbox": [
+                348.49676513671875,
+                144.91445922851562,
+                79.9034423828125,
+                308.763916015625
+            ],
+            "confidence": 0.9164161682128906,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 39,
+            "image_id": 7,
+            "predicted_object_id": 39,
+            "bbox": [
+                209.53125,
+                226.66796875,
+                48.39654541015625,
+                104.62823486328125
+            ],
+            "confidence": 0.9042789340019226,
+            "extra_dict": {
+                "category_id": 3
+            }
+        },
+        {
+            "id": 40,
+            "image_id": 7,
+            "predicted_object_id": 40,
+            "bbox": [
+                0.15118408203125,
+                0.9056396484375,
+                206.79217529296875,
+                511.0943603515625
+            ],
+            "confidence": 0.8871899247169495,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 41,
+            "image_id": 7,
+            "predicted_object_id": 41,
+            "bbox": [
+                467.78509521484375,
+                256.6005554199219,
+                44.80859375,
+                24.09100341796875
+            ],
+            "confidence": 0.8867545127868652,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 42,
+            "image_id": 7,
+            "predicted_object_id": 42,
+            "bbox": [
+                489.6761474609375,
+                232.87811279296875,
+                23.0396728515625,
+                23.9844970703125
+            ],
+            "confidence": 0.8847947716712952,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 43,
+            "image_id": 8,
+            "predicted_object_id": 43,
+            "bbox": [
+                461.62939453125,
+                175.3138427734375,
+                116.3568115234375,
+                241.427978515625
+            ],
+            "confidence": 0.9408091306686401,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 44,
+            "image_id": 8,
+            "predicted_object_id": 44,
+            "bbox": [
+                231.3441162109375,
+                165.34054565429688,
+                89.025634765625,
+                248.58282470703125
+            ],
+            "confidence": 0.9198675751686096,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 45,
+            "image_id": 8,
+            "predicted_object_id": 45,
+            "bbox": [
+                348.98388671875,
+                144.98065185546875,
+                79.2738037109375,
+                308.51025390625
+            ],
+            "confidence": 0.9156898260116577,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 46,
+            "image_id": 8,
+            "predicted_object_id": 46,
+            "bbox": [
+                209.319580078125,
+                228.309326171875,
+                47.05462646484375,
+                102.6087646484375
+            ],
+            "confidence": 0.9126119017601013,
+            "extra_dict": {
+                "category_id": 3
+            }
+        },
+        {
+            "id": 47,
+            "image_id": 8,
+            "predicted_object_id": 47,
+            "bbox": [
+                0.345733642578125,
+                0.0,
+                189.6474151611328,
+                512.0
+            ],
+            "confidence": 0.9045999646186829,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 48,
+            "image_id": 8,
+            "predicted_object_id": 48,
+            "bbox": [
+                467.802978515625,
+                256.62652587890625,
+                44.78094482421875,
+                24.2008056640625
+            ],
+            "confidence": 0.8903262615203857,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 49,
+            "image_id": 8,
+            "predicted_object_id": 49,
+            "bbox": [
+                489.65118408203125,
+                232.810546875,
+                22.9935302734375,
+                24.071044921875
+            ],
+            "confidence": 0.8861721158027649,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 50,
+            "image_id": 9,
+            "predicted_object_id": 50,
+            "bbox": [
+                461.8646240234375,
+                175.29638671875,
+                116.33984375,
+                241.43914794921875
+            ],
+            "confidence": 0.9414333701133728,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 51,
+            "image_id": 9,
+            "predicted_object_id": 51,
+            "bbox": [
+                234.89016723632812,
+                165.83523559570312,
+                86.73028564453125,
+                247.35528564453125
+            ],
+            "confidence": 0.9269843697547913,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 52,
+            "image_id": 9,
+            "predicted_object_id": 52,
+            "bbox": [
+                208.90951538085938,
+                228.77587890625,
+                47.0540771484375,
+                102.42431640625
+            ],
+            "confidence": 0.9163309931755066,
+            "extra_dict": {
+                "category_id": 3
+            }
+        },
+        {
+            "id": 53,
+            "image_id": 9,
+            "predicted_object_id": 53,
+            "bbox": [
+                349.11956787109375,
+                145.24658203125,
+                79.15087890625,
+                308.2467041015625
+            ],
+            "confidence": 0.9146158695220947,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 54,
+            "image_id": 9,
+            "predicted_object_id": 54,
+            "bbox": [
+                468.01849365234375,
+                256.6249084472656,
+                44.5865478515625,
+                24.1627197265625
+            ],
+            "confidence": 0.891633152961731,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 55,
+            "image_id": 9,
+            "predicted_object_id": 55,
+            "bbox": [
+                489.800048828125,
+                232.8096923828125,
+                22.9246826171875,
+                24.087646484375
+            ],
+            "confidence": 0.8819749355316162,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 56,
+            "image_id": 9,
+            "predicted_object_id": 56,
+            "bbox": [
+                0.5518798828125,
+                0.5279541015625,
+                161.03805541992188,
+                511.37109375
+            ],
+            "confidence": 0.880242109298706,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 57,
+            "image_id": 10,
+            "predicted_object_id": 57,
+            "bbox": [
+                461.78778076171875,
+                175.4461669921875,
+                116.4052734375,
+                241.28369140625
+            ],
+            "confidence": 0.9432723522186279,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 58,
+            "image_id": 10,
+            "predicted_object_id": 58,
+            "bbox": [
+                237.03164672851562,
+                166.8028564453125,
+                86.03350830078125,
+                243.69329833984375
+            ],
+            "confidence": 0.9327426552772522,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 59,
+            "image_id": 10,
+            "predicted_object_id": 59,
+            "bbox": [
+                208.72659301757812,
+                228.673095703125,
+                47.1273193359375,
+                102.722900390625
+            ],
+            "confidence": 0.9176149964332581,
+            "extra_dict": {
+                "category_id": 3
+            }
+        },
+        {
+            "id": 60,
+            "image_id": 10,
+            "predicted_object_id": 60,
+            "bbox": [
+                349.3871154785156,
+                145.63632202148438,
+                79.08905029296875,
+                307.7310791015625
+            ],
+            "confidence": 0.9137042164802551,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 61,
+            "image_id": 10,
+            "predicted_object_id": 61,
+            "bbox": [
+                467.86126708984375,
+                256.64398193359375,
+                44.83721923828125,
+                24.159912109375
+            ],
+            "confidence": 0.8910160660743713,
+            "extra_dict": {
+                "category_id": 2
+            }
+        },
+        {
+            "id": 62,
+            "image_id": 10,
+            "predicted_object_id": 62,
+            "bbox": [
+                489.8507080078125,
+                232.80364990234375,
+                22.94091796875,
+                24.14691162109375
+            ],
+            "confidence": 0.8803900480270386,
+            "extra_dict": {
+                "category_id": 4
+            }
+        },
+        {
+            "id": 63,
+            "image_id": 10,
+            "predicted_object_id": 63,
+            "bbox": [
+                0.189483642578125,
+                1.695556640625,
+                140.69915771484375,
+                510.304443359375
+            ],
+            "confidence": 0.8619731664657593,
+            "extra_dict": {
+                "category_id": 1
+            }
+        },
+        {
+            "id": 64,
+            "image_id": 10,
+            "predicted_object_id": 64,
+            "bbox": [
+                88.71708679199219,
+                235.097900390625,
+                98.94140625,
+                63.84515380859375
+            ],
+            "confidence": 0.8217846751213074,
+            "extra_dict": {
+                "category_id": 2
+            }
+        }
+    ]
+}
