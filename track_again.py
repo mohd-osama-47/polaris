@@ -109,7 +109,6 @@ def run(
     current_frame, prev_frame = None, None
     for frame_idx, batch in enumerate(dataset):
         path, im, current_frame, vid_cap, s = batch
-        print(s)
         with dt[0]:
             im = torch.from_numpy(im).to(device)
             im = im.half() if half else im.float()  # uint8 to fp16/32
