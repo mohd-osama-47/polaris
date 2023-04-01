@@ -5,10 +5,11 @@ import platform
 import numpy as np
 import datetime
 import json
-
+import ujson
+import signal
 import torch
 import torch.backends.cudnn as cudnn
-
+import time
 from pathlib import Path
 
 from ultralytics.nn.autobackend import AutoBackend
@@ -21,7 +22,7 @@ from ultralytics.yolo.utils.plotting import Annotator, colors, save_one_box
 from ultralytics.yolo.utils.ops import Profile, non_max_suppression, scale_boxes
 
 from polaris.yolov8_tracking.trackers.multi_tracker_zoo import create_tracker
-
+json_file, vid_writer = None, None
 IMG_FORMATS = "bmp", "dng", "jpeg", "jpg", "mpo", "png", "tif", "tiff", "webp", "pfm"  # include image suffixes
 VID_FORMATS = "asf", "avi", "gif", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "ts", "wmv"  # include video suffixes
 json_track_out = {
@@ -37,7 +38,7 @@ json_track_out = {
     "images": [],
     "predictions": []    
 }
-
+json_file = None
 @torch.no_grad()
 def run(
         # source='./resources/night.avi',
@@ -69,7 +70,7 @@ def run(
         dnn=False,  # use OpenCV DNN for ONNX inference
         vid_stride=1,  # video frame-rate stride
 ):
-
+    global json_file, vid_writer
     source = str(source)
 
     # Load model
@@ -89,12 +90,16 @@ def run(
         vid_stride=vid_stride
     )
     vid_writer = [None]
+    
     json_file_path = str(outfolder / "track_output.json")
+    with open(json_file_path, 'w') as file:
+        file.write(json.dumps(json_track_out, indent = 4))
+    json_file = open(json_file_path, 'r+')
+    ujson_data = ujson.load(json_file)
+
     vid_path = str(outfolder / "track_vid")  # im.jpg, vid.mp4, ...
     vid_path = str(Path(vid_path).with_suffix('.mp4'))  # force *.mp4 suffix on results videos
 
-    with open(json_file_path,'w') as file:
-        pass
     model.warmup(imgsz=(1, 3, *imgsz))  # warmup
 
     tracker = create_tracker(tracking_method, tracking_config, reid_weights, device, half)
@@ -107,7 +112,10 @@ def run(
     #model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))  # warmup
     seen, outputs, dt = 0, [None], (Profile(), Profile(), Profile(), Profile())
     current_frame, prev_frame = None, None
+    prediction_number = 0
+    final_tracked_object_id = 0
     for frame_idx, batch in enumerate(dataset):
+        start_loop = time.time()
         path, im, current_frame, vid_cap, s = batch
         with dt[0]:
             im = torch.from_numpy(im).to(device)
@@ -157,15 +165,15 @@ def run(
                         "file_name": "image"+str(frame_idx),
                         "extra_dict": {}
                     }
-                    json_track_out["images"].append(temp_image)
-                    #! TODO: Optimize the json read/write
-                    #? Read predictions last id from JSON
-                    try:
-                        with open(json_file_path, 'r') as outfile:
-                            count = json.load(outfile)["predictions"][-1]["id"]+1
-                    except:
-                        count = 1
-
+                    ujson_data["images"].append(temp_image)
+                    # #! TODO: Optimize the json read/write
+                    # #? Read predictions last id from JSON
+                    # try:
+                    #     with open(json_file_path, 'r') as outfile:
+                    #         count = json.load(outfile)["predictions"][-1]["id"]+1
+                    # except:
+                    #     count = 1
+                
                 for j, (output) in enumerate(outputs):
                     
                     bbox = output[0:4]
@@ -188,34 +196,36 @@ def run(
                         o_cls = int(output[5])
                         o_conf = float(output[6])
 
-                        try:
-                            with open(json_file_path, 'r') as outfile:
-                                object_count = json.load(outfile)["objects_tracked"][-1]["id"]
-                        except:
-                            object_count = 0
-                        if(o_id>object_count):
+                        # try:
+                        #     with open(json_file_path, 'r') as outfile:
+                        #         object_count = json.load(outfile)["objects_tracked"][-1]["id"]
+                        # except:
+                        #     object_count = 0
+                        if(o_id > final_tracked_object_id):
                             temp_object = {
                                 "id": o_id,
                                 "supercategory": o_cls,
                                 "extra_dict": {}
                             }
-                            json_track_out["objects_tracked"].append(temp_object)
+                            ujson_data["objects_tracked"].append(temp_object)
+                            final_tracked_object_id = o_id
                         # to MOT format
                         bbox_left = int(output[0])
                         bbox_top = int(output[1])
                         bbox_w = int(output[2] - output[0])
                         bbox_h = int(output[3] - output[1])
                         # Write JSON compliant results to file
+                        prediction_number+=1
                         temp_prediction = {
-                            "id": count,
+                            "id": prediction_number,
                             "image_id": frame_idx,
                             "predicted_object_id": o_id,
                             "bbox": [bbox_left,bbox_top,bbox_w,bbox_h],
                             "confidence": o_conf,
                             "extra_dict": {}
                         }
-                        json_track_out["predictions"].append(temp_prediction)
-                        count+=1
+                        ujson_data["predictions"].append(temp_prediction)
+                        
 
                     if save_vid or save_crop or show_vid:  # Add bbox/seg to image
                         c = int(cls)  # integer class
@@ -231,8 +241,11 @@ def run(
                         if save_crop:
                             save_one_box(np.array(bbox, dtype=np.int16), imc, file=outfolder / 'crops' / "image" / names[c] / f'{id}.jpg', BGR=True)
                 
-                with open(json_file_path, "w") as outfile:
-                    outfile.write(json.dumps(json_track_out, indent = 4))
+                # with open(json_file_path, "w") as outfile:
+                #     outfile.write(json.dumps(json_track_out, indent = 4))
+                json_file.seek(0)
+                json_file.truncate()
+                ujson.dump(ujson_data, json_file)
 
         else:
             pass
@@ -262,10 +275,12 @@ def run(
             vid_writer.write(current_frame)
 
         prev_frame = current_frame
-            
         # Print total time (preprocessing + inference + NMS + tracking)
-        LOGGER.info(f"{s}{'' if len(detections) else '(no detections), '}{sum([dt.dt for dt in dt if hasattr(dt, 'dt')]) * 1E3:.1f}ms")
-
+        LOGGER.info(f"{s}{'' if len(detections) else '(no detections), '}{sum([dt.dt for dt in dt if hasattr(dt, 'dt')]) * 1E3:.1f}ms, loop time is: {int((time.time()-start_loop)*1000)}")
+        
+    
+    json_file.close()
+    json_file = None
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms {tracking_method} update per image at shape {(1, 3, *imgsz)}' % t)
@@ -274,5 +289,24 @@ def run(
         LOGGER.info(f"Results saved to {colorstr('bold', outfolder)}{s}")
     # if update:
     #     strip_optimizer(yolo_weights)  # update model (to fix SourceChangeWarning)
+def shutdown_function(signal, frame):
+    global json_file, vid_writer
+    print("Shutting down")
+    if(json_file is not None):
+        print("Closing JSON file")
+        json_file.close()
+        json_file = None
+    if(vid_writer is not None):
+        print("Closing video writer")
+        vid_writer.release()
+        vid_writer = None
+    exit()
 
-run()
+# Register the signal handler for Ctrl+C
+signal.signal(signal.SIGINT, shutdown_function)
+try:
+    run()
+except KeyboardInterrupt:
+    pass
+# Load the shutdown function and exit
+shutdown_function(None, None)

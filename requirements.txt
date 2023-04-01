@@ -14,3 +14,4 @@ torch>=1.7.0  # see https://pytorch.org/get-started/locally (recommended)
 torchvision>=0.8.1
 tensorboard>=2.4.1
 easydict
+ujson
