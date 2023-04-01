@@ -6,7 +6,7 @@ from tqdm import tqdm, trange
 import polaris
 import shutil
 from polaris import functions as polfuncs
-from polaris import _track as trackfuncs
+# from polaris import _track as trackfuncs
 import re
 import time
 from pathlib import Path

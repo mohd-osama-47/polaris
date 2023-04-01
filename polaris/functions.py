@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+
+
 import os
 import sys
 import cv2
@@ -10,6 +12,20 @@ from tqdm import tqdm
 from pathlib import Path
 from ultralytics import YOLO
 from datetime import datetime
+
+
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[0]  # yolov5 strongsort root directory
+WEIGHTS = ROOT / 'weights'
+
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))  # add ROOT to PATH
+if str(ROOT / 'yolov8') not in sys.path:
+    sys.path.append(str(ROOT / 'yolov8_tracking'))  # add yolov5 ROOT to PATH
+if str(ROOT / 'trackers' / 'strongsort') not in sys.path:
+    sys.path.append(str(ROOT / 'trackers' / 'strongsort'))  # add strong_sort ROOT to PATH
+
+
 from ultralytics.yolo.utils import LOGGER
 from yolov8_tracking.trackers.multi_tracker_zoo import create_tracker
 from ultralytics.yolo.utils.checks import check_imgsz
@@ -17,6 +33,9 @@ from ultralytics.yolo.utils.files import increment_path
 from ultralytics.yolo.data.dataloaders.stream_loaders import LoadImages
 from ultralytics.yolo.utils.plotting import Annotator, colors, save_one_box
 from ultralytics.yolo.utils.ops import Profile, scale_boxes, non_max_suppression
+
+
+
 
 # Get the path of this file and use it to find the model to load
 cur_path = os.path.dirname(__file__)
@@ -207,8 +226,9 @@ def run_tracker(images: list, out:str, save_files:bool=False)->list:
     # model.model.warmup(imgsz=(1 if pt or model.model.triton else bs, 3, *imgsz))  # warmup
 
     tracking_method='strongsort'
-    tracking_config=None
-    reid_weights='model/osnet_x0_25_msmt17.pt'
+    tracking_config="strongsort.yaml"
+    # reid_weights='model/osnet_x0_25_msmt17.pt'
+    reid_weights = os.path.join(ROOT,'model/osnet_x0_25_msmt17.pt')
     device='0'
     half=False
 
