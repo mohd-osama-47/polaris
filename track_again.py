@@ -3,6 +3,8 @@ import os
 import cv2
 import platform
 import numpy as np
+import datetime
+import json
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -22,7 +24,21 @@ from polaris.yolov8_tracking.trackers.multi_tracker_zoo import create_tracker
 
 IMG_FORMATS = "bmp", "dng", "jpeg", "jpg", "mpo", "png", "tif", "tiff", "webp", "pfm"  # include image suffixes
 VID_FORMATS = "asf", "avi", "gif", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "ts", "wmv"  # include video suffixes
+json_track_out = {
+    "info": {
+        "contributor": "Polaris",
+        "date_created": str(datetime.datetime.now()),
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "objects_tracked": [],
+    "images": [],
+    "predictions": []    
+}
 
+@torch.no_grad()
 def run(
         source='./resources/night.avi',
         yolo_weights=Path('polaris/model/model_weights.pt'),  # model.pt path(s),
@@ -35,6 +51,7 @@ def run(
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         show_vid=True,  # show results
+        save_JSON=True, # save results to *.json
         save_txt=True,  # save results to *.txt
         save_conf=False,  # save confidences in --save-txt labels
         save_crop=False,  # save cropped prediction boxes
@@ -72,7 +89,7 @@ def run(
         exp_name = 'ensemble'
     exp_name = name if name else exp_name + "_" + reid_weights.stem
     save_dir = increment_path(Path(project) / exp_name, exist_ok=exist_ok)  # increment run
-    (save_dir / 'tracks' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
+    (save_dir / 'tracks' if (save_txt or save_JSON) else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
 
     # Load model
     device = select_device(device)
@@ -165,7 +182,49 @@ def run(
                 
                 # draw boxes for visualization
                 if len(outputs[i]) > 0:
-                    
+                    if(save_JSON):
+                        #? Write the image to JSON
+                        temp_image = {
+                            "id": frame_idx,
+                            "file_name": "image"+str(frame_idx),
+                            "extra_dict": {}
+                        }
+                        json_track_out["images"].append(temp_image)
+                        # #? Write the tracked objects to JSON
+                        # try:
+                        #     with open(txt_path + '.json', 'r') as outfile:
+                        #         object_count = json.load(outfile)["objects_tracked"][-1]["id"]
+                        # except FileNotFoundError:
+                        #     object_count = 0
+                        # new_objects = {}
+                        # for j, (output) in enumerate(outputs[i]):
+                        #     id = output[4]
+                        #     cls = output[5]
+                        #     print("id", id, type(id))
+                        #     #? check to see if new objects registered
+                        #     if(int(id)> object_count):
+                        #         new_objects[id] = cls
+                        # if(len(new_objects)):
+                        #     myKeys = list(new_objects.keys())
+                        #     myKeys.sort()
+                        #     sorted_dict = {i: new_objects[i] for i in myKeys}
+                        #     new_objects = sorted_dict
+                        #     for i in new_objects:
+                        #         #? Write new tracked_object
+                        #         temp_object = {
+                        #             "id": i,
+                        #             "supercategory": new_objects[i],
+                        #             "extra_dict": {}
+                        #         }
+                        #         json_track_out["objects_tracked"].append(temp_object)
+                
+                        #? Read predictions last id from JSON
+                        try:
+                            with open(txt_path + '.json', "r") as outfile:
+                                count = json.load(outfile)["predictions"][-1]["id"]+1
+                        except FileNotFoundError:
+                            count = 1
+
                     for j, (output) in enumerate(outputs[i]):
                         
                         bbox = output[0:4]
@@ -183,6 +242,39 @@ def run(
                             with open(txt_path + '.txt', 'a') as f:
                                 f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
                                                                bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
+                        if save_JSON:
+                            o_id = int(output[4])
+                            o_cls = int(output[5])
+                            o_conf = float(output[6])
+
+                            try:
+                                with open(txt_path + '.json', 'r') as outfile:
+                                    object_count = json.load(outfile)["objects_tracked"][-1]["id"]
+                            except FileNotFoundError:
+                                object_count = 0
+                            if(id>object_count):
+                                temp_object = {
+                                    "id": o_id,
+                                    "supercategory": o_cls,
+                                    "extra_dict": {}
+                                }
+                                json_track_out["objects_tracked"].append(temp_object)
+                            # to MOT format
+                            bbox_left = int(output[0])
+                            bbox_top = int(output[1])
+                            bbox_w = int(output[2] - output[0])
+                            bbox_h = int(output[3] - output[1])
+                            # Write JSON compliant results to file
+                            temp_prediction = {
+                                "id": count,
+                                "image_id": frame_idx,
+                                "predicted_object_id": o_id,
+                                "bbox": [bbox_left,bbox_top,bbox_w,bbox_h],
+                                "confidence": o_conf,
+                                "extra_dict": {}
+                            }
+                            json_track_out["predictions"].append(temp_prediction)
+                            count+=1
 
                         if save_vid or save_crop or show_vid:  # Add bbox/seg to image
                             c = int(cls)  # integer class
@@ -198,7 +290,10 @@ def run(
                             if save_crop:
                                 txt_file_name = txt_file_name if (isinstance(path, list) and len(path) > 1) else ''
                                 save_one_box(np.array(bbox, dtype=np.int16), imc, file=save_dir / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
-                            
+                    
+                    with open(txt_path + '.json', "w") as outfile:
+                        outfile.write(json.dumps(json_track_out, indent = 4))
+
             else:
                 pass
                 #tracker_list[i].tracker.pred_n_update_all_tracks()
