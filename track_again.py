@@ -40,7 +40,8 @@ json_track_out = {
 
 @torch.no_grad()
 def run(
-        source='./resources/night.avi',
+        # source='./resources/night.avi',
+        source='./images',
         yolo_weights=Path('polaris/model/model_weights.pt'),  # model.pt path(s),
         reid_weights=Path('polaris/model/osnet_x0_25_msmt17.pt'),  # model.pt path,
         tracking_method='strongsort',
@@ -190,34 +191,7 @@ def run(
                             "extra_dict": {}
                         }
                         json_track_out["images"].append(temp_image)
-                        # #? Write the tracked objects to JSON
-                        # try:
-                        #     with open(txt_path + '.json', 'r') as outfile:
-                        #         object_count = json.load(outfile)["objects_tracked"][-1]["id"]
-                        # except FileNotFoundError:
-                        #     object_count = 0
-                        # new_objects = {}
-                        # for j, (output) in enumerate(outputs[i]):
-                        #     id = output[4]
-                        #     cls = output[5]
-                        #     print("id", id, type(id))
-                        #     #? check to see if new objects registered
-                        #     if(int(id)> object_count):
-                        #         new_objects[id] = cls
-                        # if(len(new_objects)):
-                        #     myKeys = list(new_objects.keys())
-                        #     myKeys.sort()
-                        #     sorted_dict = {i: new_objects[i] for i in myKeys}
-                        #     new_objects = sorted_dict
-                        #     for i in new_objects:
-                        #         #? Write new tracked_object
-                        #         temp_object = {
-                        #             "id": i,
-                        #             "supercategory": new_objects[i],
-                        #             "extra_dict": {}
-                        #         }
-                        #         json_track_out["objects_tracked"].append(temp_object)
-                
+                        #! TODO: Optimize the json read/write
                         #? Read predictions last id from JSON
                         try:
                             with open(txt_path + '.json', "r") as outfile:
