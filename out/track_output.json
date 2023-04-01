@@ -1,0 +1,650 @@
+{
+    "info": {
+        "contributor": "Polaris",
+        "date_created": "2023-04-01 18:51:56.734141",
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "objects_tracked": [
+        {
+            "id": 1,
+            "supercategory": 0,
+            "extra_dict": {}
+        },
+        {
+            "id": 3,
+            "supercategory": 0,
+            "extra_dict": {}
+        },
+        {
+            "id": 4,
+            "supercategory": 3,
+            "extra_dict": {}
+        },
+        {
+            "id": 5,
+            "supercategory": 1,
+            "extra_dict": {}
+        },
+        {
+            "id": 11,
+            "supercategory": 0,
+            "extra_dict": {}
+        },
+        {
+            "id": 14,
+            "supercategory": 0,
+            "extra_dict": {}
+        },
+        {
+            "id": 15,
+            "supercategory": 2,
+            "extra_dict": {}
+        }
+    ],
+    "images": [
+        {
+            "id": 2,
+            "file_name": "image2",
+            "extra_dict": {}
+        },
+        {
+            "id": 3,
+            "file_name": "image3",
+            "extra_dict": {}
+        },
+        {
+            "id": 4,
+            "file_name": "image4",
+            "extra_dict": {}
+        },
+        {
+            "id": 5,
+            "file_name": "image5",
+            "extra_dict": {}
+        },
+        {
+            "id": 6,
+            "file_name": "image6",
+            "extra_dict": {}
+        },
+        {
+            "id": 7,
+            "file_name": "image7",
+            "extra_dict": {}
+        },
+        {
+            "id": 8,
+            "file_name": "image8",
+            "extra_dict": {}
+        },
+        {
+            "id": 9,
+            "file_name": "image9",
+            "extra_dict": {}
+        }
+    ],
+    "predictions": [
+        {
+            "id": 1,
+            "image_id": 2,
+            "predicted_object_id": 1,
+            "bbox": [
+                460,
+                175,
+                119,
+                240
+            ],
+            "confidence": 0.9401714205741882,
+            "extra_dict": {}
+        },
+        {
+            "id": 2,
+            "image_id": 2,
+            "predicted_object_id": 3,
+            "bbox": [
+                347,
+                142,
+                81,
+                310
+            ],
+            "confidence": 0.9007707834243774,
+            "extra_dict": {}
+        },
+        {
+            "id": 3,
+            "image_id": 2,
+            "predicted_object_id": 4,
+            "bbox": [
+                488,
+                232,
+                24,
+                24
+            ],
+            "confidence": 0.8731048703193665,
+            "extra_dict": {}
+        },
+        {
+            "id": 4,
+            "image_id": 2,
+            "predicted_object_id": 5,
+            "bbox": [
+                469,
+                256,
+                42,
+                24
+            ],
+            "confidence": 0.871367335319519,
+            "extra_dict": {}
+        },
+        {
+            "id": 5,
+            "image_id": 3,
+            "predicted_object_id": 1,
+            "bbox": [
+                460,
+                175,
+                118,
+                242
+            ],
+            "confidence": 0.9438472986221313,
+            "extra_dict": {}
+        },
+        {
+            "id": 6,
+            "image_id": 3,
+            "predicted_object_id": 3,
+            "bbox": [
+                345,
+                141,
+                83,
+                311
+            ],
+            "confidence": 0.9177613854408264,
+            "extra_dict": {}
+        },
+        {
+            "id": 7,
+            "image_id": 3,
+            "predicted_object_id": 4,
+            "bbox": [
+                488,
+                233,
+                23,
+                23
+            ],
+            "confidence": 0.8810803890228271,
+            "extra_dict": {}
+        },
+        {
+            "id": 8,
+            "image_id": 3,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                255,
+                44,
+                26
+            ],
+            "confidence": 0.8716766238212585,
+            "extra_dict": {}
+        },
+        {
+            "id": 9,
+            "image_id": 4,
+            "predicted_object_id": 1,
+            "bbox": [
+                460,
+                174,
+                118,
+                243
+            ],
+            "confidence": 0.9424599409103394,
+            "extra_dict": {}
+        },
+        {
+            "id": 10,
+            "image_id": 4,
+            "predicted_object_id": 3,
+            "bbox": [
+                345,
+                142,
+                82,
+                310
+            ],
+            "confidence": 0.9186631441116333,
+            "extra_dict": {}
+        },
+        {
+            "id": 11,
+            "image_id": 4,
+            "predicted_object_id": 4,
+            "bbox": [
+                489,
+                233,
+                23,
+                23
+            ],
+            "confidence": 0.877090573310852,
+            "extra_dict": {}
+        },
+        {
+            "id": 12,
+            "image_id": 4,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                255,
+                44,
+                26
+            ],
+            "confidence": 0.8729220628738403,
+            "extra_dict": {}
+        },
+        {
+            "id": 13,
+            "image_id": 4,
+            "predicted_object_id": 11,
+            "bbox": [
+                0,
+                0,
+                285,
+                511
+            ],
+            "confidence": 0.9380449652671814,
+            "extra_dict": {}
+        },
+        {
+            "id": 14,
+            "image_id": 5,
+            "predicted_object_id": 1,
+            "bbox": [
+                460,
+                173,
+                118,
+                243
+            ],
+            "confidence": 0.9409533143043518,
+            "extra_dict": {}
+        },
+        {
+            "id": 15,
+            "image_id": 5,
+            "predicted_object_id": 3,
+            "bbox": [
+                345,
+                142,
+                83,
+                310
+            ],
+            "confidence": 0.9168062806129456,
+            "extra_dict": {}
+        },
+        {
+            "id": 16,
+            "image_id": 5,
+            "predicted_object_id": 4,
+            "bbox": [
+                489,
+                231,
+                23,
+                25
+            ],
+            "confidence": 0.8731822967529297,
+            "extra_dict": {}
+        },
+        {
+            "id": 17,
+            "image_id": 5,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                255,
+                44,
+                26
+            ],
+            "confidence": 0.8735289573669434,
+            "extra_dict": {}
+        },
+        {
+            "id": 18,
+            "image_id": 5,
+            "predicted_object_id": 11,
+            "bbox": [
+                0,
+                0,
+                260,
+                511
+            ],
+            "confidence": 0.9370825290679932,
+            "extra_dict": {}
+        },
+        {
+            "id": 19,
+            "image_id": 6,
+            "predicted_object_id": 1,
+            "bbox": [
+                460,
+                174,
+                119,
+                242
+            ],
+            "confidence": 0.941623330116272,
+            "extra_dict": {}
+        },
+        {
+            "id": 20,
+            "image_id": 6,
+            "predicted_object_id": 3,
+            "bbox": [
+                347,
+                141,
+                81,
+                311
+            ],
+            "confidence": 0.9171295762062073,
+            "extra_dict": {}
+        },
+        {
+            "id": 21,
+            "image_id": 6,
+            "predicted_object_id": 4,
+            "bbox": [
+                489,
+                231,
+                23,
+                25
+            ],
+            "confidence": 0.8728334903717041,
+            "extra_dict": {}
+        },
+        {
+            "id": 22,
+            "image_id": 6,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                255,
+                44,
+                25
+            ],
+            "confidence": 0.8758136630058289,
+            "extra_dict": {}
+        },
+        {
+            "id": 23,
+            "image_id": 6,
+            "predicted_object_id": 11,
+            "bbox": [
+                0,
+                0,
+                234,
+                511
+            ],
+            "confidence": 0.9381756782531738,
+            "extra_dict": {}
+        },
+        {
+            "id": 24,
+            "image_id": 7,
+            "predicted_object_id": 1,
+            "bbox": [
+                461,
+                175,
+                118,
+                241
+            ],
+            "confidence": 0.9387463331222534,
+            "extra_dict": {}
+        },
+        {
+            "id": 25,
+            "image_id": 7,
+            "predicted_object_id": 3,
+            "bbox": [
+                347,
+                141,
+                82,
+                311
+            ],
+            "confidence": 0.916584312915802,
+            "extra_dict": {}
+        },
+        {
+            "id": 26,
+            "image_id": 7,
+            "predicted_object_id": 4,
+            "bbox": [
+                489,
+                232,
+                23,
+                24
+            ],
+            "confidence": 0.8751427531242371,
+            "extra_dict": {}
+        },
+        {
+            "id": 27,
+            "image_id": 7,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                256,
+                43,
+                24
+            ],
+            "confidence": 0.8762799501419067,
+            "extra_dict": {}
+        },
+        {
+            "id": 28,
+            "image_id": 7,
+            "predicted_object_id": 11,
+            "bbox": [
+                1,
+                0,
+                207,
+                511
+            ],
+            "confidence": 0.9191792607307434,
+            "extra_dict": {}
+        },
+        {
+            "id": 29,
+            "image_id": 7,
+            "predicted_object_id": 14,
+            "bbox": [
+                230,
+                165,
+                89,
+                247
+            ],
+            "confidence": 0.9218766093254089,
+            "extra_dict": {}
+        },
+        {
+            "id": 30,
+            "image_id": 8,
+            "predicted_object_id": 1,
+            "bbox": [
+                461,
+                176,
+                118,
+                240
+            ],
+            "confidence": 0.937744140625,
+            "extra_dict": {}
+        },
+        {
+            "id": 31,
+            "image_id": 8,
+            "predicted_object_id": 3,
+            "bbox": [
+                348,
+                142,
+                81,
+                310
+            ],
+            "confidence": 0.9169754385948181,
+            "extra_dict": {}
+        },
+        {
+            "id": 32,
+            "image_id": 8,
+            "predicted_object_id": 4,
+            "bbox": [
+                490,
+                232,
+                21,
+                23
+            ],
+            "confidence": 0.8785496950149536,
+            "extra_dict": {}
+        },
+        {
+            "id": 33,
+            "image_id": 8,
+            "predicted_object_id": 5,
+            "bbox": [
+                468,
+                256,
+                43,
+                24
+            ],
+            "confidence": 0.8762784004211426,
+            "extra_dict": {}
+        },
+        {
+            "id": 34,
+            "image_id": 8,
+            "predicted_object_id": 11,
+            "bbox": [
+                1,
+                0,
+                197,
+                511
+            ],
+            "confidence": 0.9133275747299194,
+            "extra_dict": {}
+        },
+        {
+            "id": 35,
+            "image_id": 8,
+            "predicted_object_id": 14,
+            "bbox": [
+                232,
+                166,
+                89,
+                245
+            ],
+            "confidence": 0.9216616153717041,
+            "extra_dict": {}
+        },
+        {
+            "id": 36,
+            "image_id": 8,
+            "predicted_object_id": 15,
+            "bbox": [
+                207,
+                227,
+                50,
+                105
+            ],
+            "confidence": 0.907116711139679,
+            "extra_dict": {}
+        },
+        {
+            "id": 37,
+            "image_id": 9,
+            "predicted_object_id": 1,
+            "bbox": [
+                461,
+                176,
+                118,
+                240
+            ],
+            "confidence": 0.9381260871887207,
+            "extra_dict": {}
+        },
+        {
+            "id": 38,
+            "image_id": 9,
+            "predicted_object_id": 3,
+            "bbox": [
+                348,
+                143,
+                81,
+                309
+            ],
+            "confidence": 0.9181652069091797,
+            "extra_dict": {}
+        },
+        {
+            "id": 39,
+            "image_id": 9,
+            "predicted_object_id": 4,
+            "bbox": [
+                490,
+                232,
+                21,
+                23
+            ],
+            "confidence": 0.8775878548622131,
+            "extra_dict": {}
+        },
+        {
+            "id": 40,
+            "image_id": 9,
+            "predicted_object_id": 5,
+            "bbox": [
+                469,
+                256,
+                42,
+                24
+            ],
+            "confidence": 0.8748505115509033,
+            "extra_dict": {}
+        },
+        {
+            "id": 41,
+            "image_id": 9,
+            "predicted_object_id": 11,
+            "bbox": [
+                2,
+                0,
+                177,
+                511
+            ],
+            "confidence": 0.8944776058197021,
+            "extra_dict": {}
+        },
+        {
+            "id": 42,
+            "image_id": 9,
+            "predicted_object_id": 14,
+            "bbox": [
+                234,
+                166,
+                88,
+                245
+            ],
+            "confidence": 0.923272967338562,
+            "extra_dict": {}
+        },
+        {
+            "id": 43,
+            "image_id": 9,
+            "predicted_object_id": 15,
+            "bbox": [
+                209,
+                228,
+                48,
+                104
+            ],
+            "confidence": 0.9133939146995544,
+            "extra_dict": {}
+        }
+    ]
+}

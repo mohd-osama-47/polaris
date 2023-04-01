@@ -44,6 +44,7 @@ def run(
         source='./images',
         yolo_weights=Path('polaris/model/model_weights.pt'),  # model.pt path(s),
         reid_weights=Path('polaris/model/osnet_x0_25_msmt17.pt'),  # model.pt path,
+        outfolder=Path('out'),  # output folder path,
         tracking_method='strongsort',
         tracking_config=Path('strongsort.yaml'),
         imgsz=(640, 512),  # inference size (height, width)
@@ -57,7 +58,7 @@ def run(
         save_conf=False,  # save confidences in --save-txt labels
         save_crop=False,  # save cropped prediction boxes
         save_trajectories=False,  # save trajectories for each track
-        save_vid=False,  # save confidences in --save-txt labels
+        save_vid=True,  # save confidences in --save-txt labels
         nosave=False,  # do not save images/videos
         classes=None,  # filter by class: --class 0, or --class 0 2 3
         agnostic_nms=False,  # class-agnostic NMS
@@ -78,23 +79,9 @@ def run(
 ):
 
     source = str(source)
-    save_img = not nosave and not source.endswith('.txt')  # save inference images
-    is_file = Path(source).suffix[1:] in (VID_FORMATS)
-
-    # Directories
-    if not isinstance(yolo_weights, list):  # single yolo model
-        exp_name = yolo_weights.stem
-    elif type(yolo_weights) is list and len(yolo_weights) == 1:  # single models after --yolo_weights
-        exp_name = Path(yolo_weights[0]).stem
-    else:  # multiple models after --yolo_weights
-        exp_name = 'ensemble'
-    exp_name = name if name else exp_name + "_" + reid_weights.stem
-    save_dir = increment_path(Path(project) / exp_name, exist_ok=exist_ok)  # increment run
-    (save_dir / 'tracks' if (save_txt or save_JSON) else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
 
     # Load model
     device = select_device(device)
-    is_seg = '-seg' in str(yolo_weights)
     model = AutoBackend(yolo_weights, device=device, dnn=dnn, fp16=half)
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_imgsz(imgsz, stride=stride)  # check image size
@@ -110,6 +97,9 @@ def run(
         vid_stride=vid_stride
     )
     vid_path, vid_writer, txt_path = [None] * bs, [None] * bs, [None] * bs
+    json_file_path = str(outfolder / "track_output.json")
+    with open(json_file_path,'w') as file:
+        pass
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
 
     # Create as many strong sort instances as there are video sources
@@ -124,42 +114,39 @@ def run(
 
     # Run tracking
     #model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))  # warmup
-    seen, windows, dt = 0, [], (Profile(), Profile(), Profile(), Profile())
+    # seen, windows, dt = 0, [], (Profile(), Profile(), Profile(), Profile())
+    seen, windows = 0, []
     curr_frames, prev_frames = [None] * bs, [None] * bs
     for frame_idx, batch in enumerate(dataset):
         path, im, im0s, vid_cap, s = batch
-        visualize = increment_path(save_dir / Path(path[0]).stem, mkdir=True) if visualize else False
-        with dt[0]:
-            im = torch.from_numpy(im).to(device)
-            im = im.half() if half else im.float()  # uint8 to fp16/32
-            im /= 255.0  # 0 - 255 to 0.0 - 1.0
-            if len(im.shape) == 3:
-                im = im[None]  # expand for batch dim
+        im = torch.from_numpy(im).to(device)
+        im = im.half() if half else im.float()  # uint8 to fp16/32
+        im /= 255.0  # 0 - 255 to 0.0 - 1.0
+        if len(im.shape) == 3:
+            im = im[None]  # expand for batch dim
 
         # Inference
-        with dt[1]:
-            preds = model(im, augment=augment, visualize=visualize)
+        predictions = model(im, augment=False, visualize=False)
 
         # Apply NMS
-        with dt[2]:
-            p = non_max_suppression(preds, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
+        predictionsNMS = non_max_suppression(predictions, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
             
         # Process detections
-        for i, det in enumerate(p):  # detections per image
+        for i, detections in enumerate(predictionsNMS):  # detections per image
             seen += 1
             p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
             p = Path(p)  # to Path
             # video file
             if source.endswith(VID_FORMATS):
                 txt_file_name = p.stem
-                save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
+                save_path = str(outfolder / p.name)  # im.jpg, vid.mp4, ...
             # folder with imgs
             else:
                 txt_file_name = p.parent.name  # get folder name containing current img
-                save_path = str(save_dir / p.parent.name)  # im.jpg, vid.mp4, ...
+                save_path = str(outfolder / p.parent.name)  # im.jpg, vid.mp4, ...
             curr_frames[i] = im0
 
-            txt_path = str(save_dir / 'tracks' / txt_file_name)  # im.txt
+            txt_path = str(outfolder / 'tracks' / txt_file_name)  # im.txt
             s += '%gx%g ' % im.shape[2:]  # print string
             imc = im0.copy() if save_crop else im0  # for save_crop
 
@@ -169,19 +156,18 @@ def run(
                 if prev_frames[i] is not None and curr_frames[i] is not None:  # camera motion compensation
                     tracker_list[i].tracker.camera_update(prev_frames[i], curr_frames[i])
 
-            if det is not None and len(det):
-                det[:, :4] = scale_boxes(im.shape[2:], det[:, :4], im0.shape).round()  # rescale boxes to im0 size
+            if detections is not None and len(detections):
+                detections[:, :4] = scale_boxes(im.shape[2:], detections[:, :4], im0.shape).round()  # rescale boxes to im0 size
 
                 # Print results
-                for c in det[:, 5].unique():
-                    n = (det[:, 5] == c).sum()  # detections per class
+                for c in detections[:, 5].unique():
+                    n = (detections[:, 5] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
                 # pass detections to strongsort
-                with dt[3]:
-                    outputs[i] = tracker_list[i].update(det.cpu(), im0)
+                outputs[i] = tracker_list[i].update(detections.cpu(), im0)
                 
-                # draw boxes for visualization
+                # draw boxes for visualization and output file to json
                 if len(outputs[i]) > 0:
                     if(save_JSON):
                         #? Write the image to JSON
@@ -194,9 +180,9 @@ def run(
                         #! TODO: Optimize the json read/write
                         #? Read predictions last id from JSON
                         try:
-                            with open(txt_path + '.json', "r") as outfile:
+                            with open(json_file_path, 'r') as outfile:
                                 count = json.load(outfile)["predictions"][-1]["id"]+1
-                        except FileNotFoundError:
+                        except:
                             count = 1
 
                     for j, (output) in enumerate(outputs[i]):
@@ -206,27 +192,27 @@ def run(
                         cls = output[5]
                         conf = output[6]
 
-                        if save_txt:
-                            # to MOT format
-                            bbox_left = output[0]
-                            bbox_top = output[1]
-                            bbox_w = output[2] - output[0]
-                            bbox_h = output[3] - output[1]
-                            # Write MOT compliant results to file
-                            with open(txt_path + '.txt', 'a') as f:
-                                f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                               bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
+                        # if save_txt:
+                        #     # to MOT format
+                        #     bbox_left = output[0]
+                        #     bbox_top = output[1]
+                        #     bbox_w = output[2] - output[0]
+                        #     bbox_h = output[3] - output[1]
+                        #     # Write MOT compliant results to file
+                        #     with open(txt_path + '.txt', 'a') as f:
+                        #         f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
+                        #                                        bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
                         if save_JSON:
                             o_id = int(output[4])
                             o_cls = int(output[5])
                             o_conf = float(output[6])
 
                             try:
-                                with open(txt_path + '.json', 'r') as outfile:
+                                with open(json_file_path, 'r') as outfile:
                                     object_count = json.load(outfile)["objects_tracked"][-1]["id"]
-                            except FileNotFoundError:
+                            except:
                                 object_count = 0
-                            if(id>object_count):
+                            if(o_id>object_count):
                                 temp_object = {
                                     "id": o_id,
                                     "supercategory": o_cls,
@@ -263,9 +249,9 @@ def run(
                                 tracker_list[i].trajectory(im0, q, color=color)
                             if save_crop:
                                 txt_file_name = txt_file_name if (isinstance(path, list) and len(path) > 1) else ''
-                                save_one_box(np.array(bbox, dtype=np.int16), imc, file=save_dir / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
+                                save_one_box(np.array(bbox, dtype=np.int16), imc, file=outfolder / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
                     
-                    with open(txt_path + '.json', "w") as outfile:
+                    with open(json_file_path, "w") as outfile:
                         outfile.write(json.dumps(json_track_out, indent = 4))
 
             else:
@@ -302,14 +288,14 @@ def run(
             prev_frames[i] = curr_frames[i]
             
         # Print total time (preprocessing + inference + NMS + tracking)
-        LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{sum([dt.dt for dt in dt if hasattr(dt, 'dt')]) * 1E3:.1f}ms")
+        LOGGER.info(f"{s}{'' if len(detections) else '(no detections), '}ms")
 
     # Print results
-    t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
-    LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms {tracking_method} update per image at shape {(1, 3, *imgsz)}' % t)
+    # t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
+    LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms {tracking_method} update per image at shape {(1, 3, *imgsz)}')
     if save_txt or save_vid:
-        s = f"\n{len(list((save_dir / 'tracks').glob('*.txt')))} tracks saved to {save_dir / 'tracks'}" if save_txt else ''
-        LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
+        s = f"\n{len(list((outfolder / 'tracks').glob('*.txt')))} tracks saved to {outfolder / 'tracks'}" if save_txt else ''
+        LOGGER.info(f"Results saved to {colorstr('bold', outfolder)}{s}")
     # if update:
     #     strip_optimizer(yolo_weights)  # update model (to fix SourceChangeWarning)
 
