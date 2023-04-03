@@ -271,20 +271,31 @@ def _main(parser=argparse.ArgumentParser()):
 
     predict = subparser.add_parser("predict", help="Run model on a directory of images and same the results on a passed folder")
     track = subparser.add_parser("track", help="Run tracking on a directory of images and save the results to output directory")
-
     prepare_set = subparser.add_parser("set-prep", help="Given the supplied dataset, prepare the dataset to follow yolo convention and merge all categories to their respective super-category")
+    
     
     predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
     predict.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
     predict.add_argument("--save-images", help="Save annotated images in the passed directory", action='store_true')
     parser.set_defaults(save_images=False)
     
-    
+    # Track mode parameters
     track.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
     track.add_argument("-o", "--output_path", help="Path to the output image directory", type=str, required=True)
-    track.add_argument("--save-images", help="Save annotated images in the passed directory", action='store_true')
-    parser.set_defaults(save_images=False)
+    track.add_argument("--save-json", help="Save tracker results as a JSON file in the output directory.", action='store_true')
+    track.add_argument("--save-vid", help="Save tracking results as a video in the output directory.", action='store_true')
+    track.add_argument("--show-vid", help="Show tracking results in real-time as a video feed.", action='store_true')
+    track.add_argument("--verbose", help="Show results in the terminal, useful for debugging", action='store_true')
+    track.add_argument("--show-traj", help="Show trajectory of movement of tracked object", action='store_true')
+    track.add_argument("--is-video", help="Specifies if the passed input is a video file or not", action='store_true')
+    parser.set_defaults(save_json=False)
+    parser.set_defaults(save_vid=False)
+    parser.set_defaults(show_vid=False)
+    parser.set_defaults(verbose=False)
+    parser.set_defaults(show_traj=False)
+    parser.set_defaults(is_video=False)
     
+    # Dataset preparation mode parameters
     prepare_set.add_argument("-i", "--input_path", help="Path to the input dataset directory", type=str, required=True)
 
     args = parser.parse_args()
@@ -300,10 +311,12 @@ def _main(parser=argparse.ArgumentParser()):
 
     if args.command == 'track':
         try:
-            check_if_folder(args.input_path, args.output_path)
-            process_tracking(args.input_path, args.output_path, args.save_images)
+            if not args.is_video:
+                check_if_folder(args.input_path, args.output_path)
+            # process_tracking(args.input_path, args.output_path, args.save_images)
+            polfuncs.run_tracker(args.input_path, outfolder=Path(args.output_path),save_JSON=args.save_json, save_vid=args.save_vid, show_vid=args.show_vid, is_verbose=args.verbose, save_trajectories=args.show_traj)
         except InputDirectoryException:
-            print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
+            print(f"[WARN] INPUT FOLDER PASSED IS NOT A VALID DIRECTORY! DID YOU MEAN TO PASS A VIDEO FILE? CHECK --help")
         except OutputDirectoryException:
             print(f"[WARN] OUTPUT FOLDER PASSED IS NOT A VALID DIRECTORY!")
         
