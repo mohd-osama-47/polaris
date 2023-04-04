@@ -228,7 +228,7 @@ def run_tracker(
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
-        device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
+        device='0',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         show_vid=True,  # show results
         save_JSON=True, # save results to *.json
         save_txt=False,  # save results to *.txt
@@ -251,7 +251,10 @@ def run_tracker(
     source = str(source)
 
     # Load model
-    device = select_device(device)
+    try:
+        device = select_device(device)
+    except:
+        device = select_device('')
     model = AutoBackend(yolo_weights, device=device, dnn=dnn, fp16=half, verbose=is_verbose)
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_imgsz(imgsz, stride=stride)  # check image size
