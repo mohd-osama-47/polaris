@@ -265,7 +265,7 @@ def run_tracker(
         transforms=getattr(model.model, 'transforms', None),
         vid_stride=vid_stride
     )
-    vid_writer = [None]
+    vid_writer = None
     # if save_JSON:
         
     #     json_file_path = str(outfolder / "track_output.json")
@@ -358,16 +358,6 @@ def run_tracker(
                     cls = output[5]
                     conf = output[6]
 
-                    # if save_txt:
-                    #     # to MOT format
-                    #     bbox_left = output[0]
-                    #     bbox_top = output[1]
-                    #     bbox_w = output[2] - output[0]
-                    #     bbox_h = output[3] - output[1]
-                    #     # Write MOT compliant results to file
-                    #     with open(txt_path + '.txt', 'a') as f:
-                    #         f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                    #                                        bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
                     if save_JSON:
                         o_id = int(output[4])
                         o_cls = int(output[5])
@@ -449,15 +439,15 @@ def run_tracker(
 
         # Save results (image with detections)
         if save_vid:
-            if isinstance(vid_writer, cv2.VideoWriter):
-                vid_writer.release()  # release previous video writer
-            if vid_cap:  # video
-                fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            else:  # stream
-                fps, w, h = 30, current_frame.shape[1], current_frame.shape[0]
-            vid_writer = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+            if vid_writer == None:
+                if vid_cap:  # video
+                    fps = vid_cap.get(cv2.CAP_PROP_FPS)
+                    w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                    h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                else:  # stream
+                    fps, w, h = 30, current_frame.shape[1], current_frame.shape[0]
+                vid_writer = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+                # vid_writer.release()  # release previous video writer
             vid_writer.write(current_frame)
 
         prev_frame = current_frame
@@ -474,6 +464,8 @@ def run_tracker(
     if save_txt or save_vid:
         s = f"\n{len(list((outfolder / 'tracks').glob('*.txt')))} tracks saved to {outfolder / 'tracks'}" if save_txt else ''
         LOGGER.info(f"Results saved to {colorstr('bold', outfolder)}{s}")
+    if save_vid:
+        vid_writer.release()
 
 # The following functionality is taken from the GitHub repo: 
 
