@@ -269,9 +269,9 @@ def _main(parser=argparse.ArgumentParser()):
     # construct the argument parser and parse the arguments
     subparser = parser.add_subparsers(dest='command')
 
-    predict = subparser.add_parser("predict", help="Run model on a directory of images and same the results on a passed folder")
+    predict = subparser.add_parser("predict", help="Run model on a directory of images and save the results on a passed folder")
     track = subparser.add_parser("track", help="Run tracking on a directory of images and save the results to output directory")
-    prepare_set = subparser.add_parser("set-prep", help="Given the supplied dataset, prepare the dataset to follow yolo convention and merge all categories to their respective super-category")
+    prepare_set = subparser.add_parser("set-prep", help="Given the supplied dataset, prepare the dataset by merging all categories to their respective super-category")
     
     
     predict.add_argument("-i", "--input_path", help="Path to the input image directory", type=str, required=True)
