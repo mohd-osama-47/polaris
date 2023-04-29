@@ -374,7 +374,7 @@ def run_tracker(
                         if(o_id > final_tracked_object_id):
                             temp_object = {
                                 "id": o_id,
-                                "supercategory": o_cls,
+                                "supercategory": CLASSES_DICT[o_cls],
                                 "extra_dict": {}
                             }
                             json_track_out["objects_tracked"].append(temp_object)
@@ -391,6 +391,7 @@ def run_tracker(
                             "image_id": frame_idx,
                             "predicted_object_id": o_id,
                             "bbox": [bbox_left,bbox_top,bbox_w,bbox_h],
+                            "track_id": o_id,
                             "confidence": o_conf,
                             "extra_dict": {}
                         }
