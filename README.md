@@ -228,6 +228,7 @@ The classes output in the JSON file correspond to the following labels:
 ```
 
 </details>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Generating Merged Dataset
@@ -294,6 +295,9 @@ The CLI will now begin the dataset generation process and the progress will be s
 <div align="center">
   <img src="resources/SampleOutputPolaris.png" alt="Dataset Prep Sample">
 </div>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!-- CONTACT -->
 ## Contact
