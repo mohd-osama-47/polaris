@@ -192,39 +192,50 @@ The classes output in the JSON file correspond to the following labels:
 
 
 ```json
-"categories": [
-  {
-      "id": 0,
-      "name": "Person",
-  },
-  {
-      "id": 1,
-      "name": "offroad_vehicle",
-  },
-  {
-      "id": 2,
-      "name": "Motorcyclist",
-  },
-  {
-      "id": 3,
-      "name": "ATV driver",
-  },
-  {
-      "id": 4,
-      "name": "None",
-  },
-  {
-      "id": 5,
-      "name": "Car",
-  },
-  {
-      "id": 6,
-      "name": "Bus",
-  },
-  {
-      "id": 7,
-      "name": "Truck",
-  },
+{
+    "info": {
+        "contributor": "Polaris",
+        "date_created": DATE,
+        "description": "",
+        "url": "",
+        "version": "",
+        "year": ""
+    },
+    "objects_tracked": [
+        {
+            "id": 1,
+            "supercategory": "",
+            "extra_dict": {}
+        },
+        {
+            "id": 2,
+            "supercategory": "",
+            "extra_dict": {}
+        },
+    ],
+    "images": [
+        {
+            "id": ID,
+            "file_name": FILE_NAME,
+            "extra_dict": {}
+        },
+    ],
+    "predictions": [
+        {
+          "id": ID,
+          "image_id": IMAGE_ID,
+          "predicted_object_id": 1,
+          "bbox": [
+              Top Left X,
+              Top Left Y,
+              Width,
+              Height
+          ],
+          "confidence": ,
+          "extra_dict": {}
+        }
+    ],
+}
 ```
 
 </details>
