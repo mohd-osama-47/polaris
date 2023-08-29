@@ -314,6 +314,7 @@ The CLI will now begin the dataset generation process and the progress will be s
 ## Contact
 
 Mohammed Osama - [LinkedIn](https://www.linkedin.com/in/mohd-osama) - mohd.osama.elnour@gmail.com
+Mike Simon - [LinkedIn](https://www.linkedin.com/in/mike1simon/) - mike1simon3000@gmail.com
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
